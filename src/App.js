@@ -1,25 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import AddApplication from './AddApplication';
+import Dashboard from './Dashboard';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div style={styles.navbar}>
+        <Link to="/" style={styles.link}>Dashboard</Link>
+        <Link to="/add" style={styles.link}>Add Application</Link>
+      </div>
+
+      <div style={styles.container}>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/add" element={<AddApplication />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
+
+const styles = {
+  navbar: {
+    background: '#007bff',
+    padding: '12px',
+    display: 'flex',
+    gap: '16px',
+  },
+  link: {
+    color: 'white',
+    textDecoration: 'none',
+    fontWeight: 'bold',
+  },
+  container: {
+    padding: '24px',
+  }
+};
 
 export default App;
