@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { db, auth } from './firebase';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
+import { auth } from './firebase';
 
 const statuses = ['Submitted', 'Responded', 'Interview', 'Offer', 'Rejected'];
 
@@ -60,6 +62,12 @@ const Dashboard = () => {
   );
 };
 
+
+const handleLogout = () => {
+  signOut(auth).then(() => alert("Logged out"));
+};
+
+
 const styles = {
   board: {
     display: 'flex',
@@ -105,3 +113,4 @@ delete: {
 };
 
 export default Dashboard;
+
