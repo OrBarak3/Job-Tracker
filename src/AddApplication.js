@@ -13,18 +13,34 @@ const AddApplication = () => {
   });
 
   const handleChange = (e) => {
-    setForm({...form, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const user = auth.currentUser;
+    if (!user) {
+      alert("You must be logged in to submit an application.");
+      return;
+    }
+
     try {
-      await addDoc(collection(db, 'applications'), {
-        ...form,
-        user: auth.currentUser?.email || "or", // fallback for now
-        createdAt: Timestamp.now()
-      });
+      await addDoc(
+        collection(db, `users/${user.uid}/applications`),
+        {
+          company: form.company,
+          jobTitle: form.jobTitle,
+          companyDescription: form.companyDescription,
+          submissionDate: form.submissionDate,
+          status: form.status,
+          url: form.url,
+          createdAt: Timestamp.now()
+        }
+      );
       alert("Application added!");
+
+      // Reset form
       setForm({
         company: '',
         jobTitle: '',
@@ -35,6 +51,7 @@ const AddApplication = () => {
       });
     } catch (err) {
       console.error("Error adding application:", err);
+      alert("Error adding application. See console for details.");
     }
   };
 
