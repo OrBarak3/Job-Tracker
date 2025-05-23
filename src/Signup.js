@@ -11,7 +11,7 @@ export default function Signup() {
     e.preventDefault();
     try {
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
-      // Create empty user doc in Firestore
+      // Create user document in Firestore
       await setDoc(doc(db, "users", userCred.user.uid), {});
       alert("Account created!");
     } catch (err) {
@@ -20,11 +20,25 @@ export default function Signup() {
   };
 
   return (
-    <form onSubmit={handleSignup}>
-      <h2>Sign Up</h2>
-      <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" required />
-      <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" required />
-      <button type="submit">Sign Up</button>
-    </form>
+    <div style={{ maxWidth: "400px", margin: "0 auto", padding: "1rem" }}>
+      <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <h2>Sign Up</h2>
+        <input
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="Email"
+          required
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          placeholder="Password"
+          required
+        />
+        <button type="submit">Sign Up</button>
+      </form>
+    </div>
   );
 }
