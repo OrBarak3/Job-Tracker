@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import AddApplication from './AddApplication';
 import Dashboard from './Dashboard';
+import Signup from './Signup';
+import Login from './Login';
 
 function App() {
   return (
@@ -9,12 +11,16 @@ function App() {
       <div style={styles.navbar}>
         <Link to="/" style={styles.link}>Dashboard</Link>
         <Link to="/add" style={styles.link}>Add Application</Link>
+        <Link to="/signup" style={styles.link}>Sign Up</Link>
+        <Link to="/login" style={styles.link}>Log In</Link>
       </div>
 
       <div style={styles.container}>
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/add" element={<AddApplication />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </div>
     </Router>

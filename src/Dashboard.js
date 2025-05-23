@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { db, auth } from './firebase';
-import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  getDocs,
+  deleteDoc,
+  doc
+} from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
-import { auth } from './firebase';
+import { useNavigate } from 'react-router-dom';
 
 const statuses = ['Submitted', 'Responded', 'Interview', 'Offer', 'Rejected'];
 
 const Dashboard = () => {
   const [applications, setApplications] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const q = query(
-          collection(db, 'applications'),
-          where('user', '==', auth.currentUser?.email || 'or')
-        );
+        if (!auth.currentUser) return;
+        const q = collection(db, `users/${auth.currentUser.uid}/applications`);
         const snapshot = await getDocs(q);
         const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setApplications(data);
@@ -30,7 +35,7 @@ const Dashboard = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Delete this application?")) {
       try {
-        await deleteDoc(doc(db, 'applications', id));
+        await deleteDoc(doc(db, `users/${auth.currentUser.uid}/applications`, id));
         setApplications(prev => prev.filter(app => app.id !== id));
       } catch (err) {
         console.error('Error deleting application:', err);
@@ -38,35 +43,47 @@ const Dashboard = () => {
     }
   };
 
+  const handleLogout = () => {
+    signOut(auth).then(() => {
+      alert("Logged out");
+      navigate('/login');
+    });
+  };
+
   return (
-    <div style={styles.board}>
-      {statuses.map((status) => (
-        <div key={status} style={styles.column}>
-          <h3 style={styles.header}>{status} ({applications.filter(app => app.status === status).length})</h3>
-          {applications
-            .filter(app => app.status === status)
-            .map((app) => (
-              <div key={app.id} style={styles.card}>
-                <strong>{app.jobTitle}</strong> @ {app.company}
-                <p>{app.companyDescription}</p>
-                <a href={app.url} target="_blank" rel="noreferrer">Job Link</a>
-                <div style={styles.footer}>
-                  <a href={app.url} target="_blank" rel="noreferrer">Job Link</a>
-                  <button onClick={() => handleDelete(app.id)} style={styles.delete}>🗑️</button>
+    <div style={{ padding: '1rem' }}>
+      <h2>Welcome, {auth.currentUser?.email}</h2>
+
+      <div style={{ marginBottom: '16px', display: 'flex', gap: '12px' }}>
+        <button onClick={() => navigate('/signup')}>Go to Sign Up</button>
+        <button onClick={() => navigate('/login')}>Go to Login</button>
+        <button onClick={handleLogout}>Logout</button>
+      </div>
+
+      <div style={styles.board}>
+        {statuses.map((status) => (
+          <div key={status} style={styles.column}>
+            <h3 style={styles.header}>
+              {status} ({applications.filter(app => app.status === status).length})
+            </h3>
+            {applications
+              .filter(app => app.status === status)
+              .map((app) => (
+                <div key={app.id} style={styles.card}>
+                  <strong>{app.jobTitle}</strong> @ {app.company}
+                  <p>{app.companyDescription}</p>
+                  <div style={styles.footer}>
+                    <a href={app.url} target="_blank" rel="noreferrer">Job Link</a>
+                    <button onClick={() => handleDelete(app.id)} style={styles.delete}>🗑️</button>
+                  </div>
                 </div>
-              </div>
-            ))}
-        </div>
-      ))}
+              ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
-
-
-const handleLogout = () => {
-  signOut(auth).then(() => alert("Logged out"));
-};
-
 
 const styles = {
   board: {
@@ -95,22 +112,20 @@ const styles = {
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   },
   footer: {
-  marginTop: '12px',
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
+    marginTop: '12px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-
-delete: {
-  background: '#dc3545',
-  color: 'white',
-  border: 'none',
-  padding: '4px 8px',
-  borderRadius: '4px',
-  cursor: 'pointer',
-  fontSize: '14px',
+  delete: {
+    background: '#dc3545',
+    color: 'white',
+    border: 'none',
+    padding: '4px 8px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px',
   }
 };
 
 export default Dashboard;
-
