@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { db, auth } from './firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 
 const statuses = ['Submitted', 'Responded', 'Interview', 'Offer', 'Rejected'];
 
@@ -12,7 +12,7 @@ const Dashboard = () => {
       try {
         const q = query(
           collection(db, 'applications'),
-          where('user', '==', auth.currentUser?.email || 'or') // fallback to 'or'
+          where('user', '==', auth.currentUser?.email || 'or')
         );
         const snapshot = await getDocs(q);
         const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -24,6 +24,17 @@ const Dashboard = () => {
 
     fetchApplications();
   }, []);
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Delete this application?")) {
+      try {
+        await deleteDoc(doc(db, 'applications', id));
+        setApplications(prev => prev.filter(app => app.id !== id));
+      } catch (err) {
+        console.error('Error deleting application:', err);
+      }
+    }
+  };
 
   return (
     <div style={styles.board}>
@@ -37,6 +48,7 @@ const Dashboard = () => {
                 <strong>{app.jobTitle}</strong> @ {app.company}
                 <p>{app.companyDescription}</p>
                 <a href={app.url} target="_blank" rel="noreferrer">Job Link</a>
+                <button onClick={() => handleDelete(app.id)} style={styles.delete}>🗑️ Delete</button>
               </div>
             ))}
         </div>
@@ -61,7 +73,7 @@ const styles = {
   header: {
     textAlign: 'center',
     marginBottom: '12px',
-    color: '#007bff'
+    color: '#007bff',
   },
   card: {
     backgroundColor: '#fff',
@@ -70,6 +82,15 @@ const styles = {
     padding: '8px',
     marginBottom: '8px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+  },
+  delete: {
+    marginTop: '8px',
+    background: '#dc3545',
+    color: 'white',
+    border: 'none',
+    padding: '6px 12px',
+    borderRadius: '4px',
+    cursor: 'pointer',
   }
 };
 
