@@ -55,12 +55,6 @@ const Dashboard = () => {
   return (
     <div style={{ padding: '1rem' }}>
       <h2>Welcome, {auth.currentUser?.email}</h2>
-      <div style={{ marginBottom: '16px', display: 'flex', gap: '12px' }}>
-        <button onClick={() => navigate('/signup')}>Go to Sign Up</button>
-        <button onClick={() => navigate('/login')}>Go to Login</button>
-        <button onClick={() => signOut(auth).then(() => navigate('/login'))}>Logout</button>
-      </div>
-
       <DragDropContext onDragEnd={onDragEnd}>
         <div style={styles.board}>
           {statuses.map((status) => (
