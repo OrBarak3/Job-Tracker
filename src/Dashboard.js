@@ -10,6 +10,8 @@ import {
 import { signOut } from 'firebase/auth';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 
 const statuses = ['Submitted', 'Responded', 'Interview', 'Offer', 'Rejected'];
 
@@ -28,11 +30,55 @@ const Dashboard = () => {
     fetchApplications();
   }, []);
 
-  const handleDelete = async (id) => {
-    if (!auth.currentUser) return;
-    await deleteDoc(doc(db, `users/${auth.currentUser.uid}/applications`, id));
-    setApplications(prev => prev.filter(app => app.id !== id));
-  };
+const handleDelete = (id) => {
+  toast.info(
+    <div>
+      <strong>Delete this application?</strong>
+      <div style={{ marginTop: '8px', display: 'flex', gap: '8px' }}>
+        <button
+          onClick={async () => {
+            toast.dismiss(); // close the toast
+            try {
+              await deleteDoc(doc(db, `users/${auth.currentUser.uid}/applications`, id));
+              setApplications(prev => prev.filter(app => app.id !== id));
+              toast.success("Application deleted.");
+            } catch (err) {
+              console.error("Error deleting application:", err);
+              toast.error("Failed to delete.");
+            }
+          }}
+          style={{
+            backgroundColor: '#dc3545',
+            color: 'white',
+            border: 'none',
+            padding: '4px 10px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}
+        >
+          Yes
+        </button>
+        <button
+          onClick={() => toast.dismiss()}
+          style={{
+            backgroundColor: '#6c757d',
+            color: 'white',
+            border: 'none',
+            padding: '4px 10px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}
+        >
+          No
+        </button>
+      </div>
+    </div>,
+    { autoClose: false }
+  );
+};
+
 
   const onDragEnd = async (result) => {
     const { source, destination, draggableId } = result;
