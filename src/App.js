@@ -1,26 +1,38 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import AddApplication from './AddApplication';
 import Dashboard from './Dashboard';
 import Signup from './Signup';
 import Login from './Login';
+import { useAuth } from './AuthContext';
+
+function PrivateRoute({ element }) {
+  const { currentUser } = useAuth();
+  return currentUser ? element : <Navigate to="/login" />;
+}
 
 function App() {
+  const { currentUser } = useAuth();
+
   return (
     <Router>
-      <div style={styles.navbar}>
-        <Link to="/" style={styles.link}>Dashboard</Link>
-        <Link to="/add" style={styles.link}>Add Application</Link>
-        <Link to="/signup" style={styles.link}>Sign Up</Link>
-        <Link to="/login" style={styles.link}>Log In</Link>
-      </div>
+      {currentUser && (
+        <div style={styles.navbar}>
+          <Link to="/dashboard" style={styles.link}>Dashboard</Link>
+          <Link to="/add" style={styles.link}>Add Application</Link>
+          <button onClick={() => { localStorage.clear(); window.location.reload(); }} style={{ ...styles.link, background: 'none', border: 'none' }}>
+            Log Out
+          </button>
+        </div>
+      )}
 
       <div style={styles.container}>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/add" element={<AddApplication />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
+          <Route path="/add" element={<PrivateRoute element={<AddApplication />} />} />
         </Routes>
       </div>
     </Router>
@@ -38,6 +50,7 @@ const styles = {
     color: 'white',
     textDecoration: 'none',
     fontWeight: 'bold',
+    cursor: 'pointer',
   },
   container: {
     padding: '24px',
