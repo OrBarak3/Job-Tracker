@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { db, auth } from './firebase';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  doc,
+  deleteDoc
+} from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useNavigate } from 'react-router-dom';
 
 const statuses = ['Submitted', 'Responded', 'Interview', 'Offer', 'Rejected'];
@@ -12,69 +19,89 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchApplications = async () => {
-      try {
-        if (!auth.currentUser) return;
-        const q = collection(db, `users/${auth.currentUser.uid}/applications`);
-        const snapshot = await getDocs(q);
-        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setApplications(data);
-      } catch (err) {
-        console.error('Error fetching applications:', err);
-      }
+      if (!auth.currentUser) return;
+      const q = collection(db, `users/${auth.currentUser.uid}/applications`);
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setApplications(data);
     };
-
     fetchApplications();
   }, []);
 
   const handleDelete = async (id) => {
-    if (window.confirm("Delete this application?")) {
-      try {
-        await deleteDoc(doc(db, `users/${auth.currentUser.uid}/applications`, id));
-        setApplications(prev => prev.filter(app => app.id !== id));
-      } catch (err) {
-        console.error('Error deleting application:', err);
-      }
-    }
+    if (!auth.currentUser) return;
+    await deleteDoc(doc(db, `users/${auth.currentUser.uid}/applications`, id));
+    setApplications(prev => prev.filter(app => app.id !== id));
   };
 
-  const handleLogout = () => {
-    signOut(auth).then(() => {
-      alert("Logged out");
-      navigate('/login');
+  const onDragEnd = async (result) => {
+    const { source, destination, draggableId } = result;
+    if (!destination || destination.droppableId === source.droppableId) return;
+
+    const updated = applications.map(app => {
+      if (app.id === draggableId) {
+        return { ...app, status: destination.droppableId };
+      }
+      return app;
     });
+
+    setApplications(updated);
+
+    // Update Firestore
+    const docRef = doc(db, `users/${auth.currentUser.uid}/applications`, draggableId);
+    await updateDoc(docRef, { status: destination.droppableId });
   };
 
   return (
     <div style={{ padding: '1rem' }}>
       <h2>Welcome, {auth.currentUser?.email}</h2>
-
       <div style={{ marginBottom: '16px', display: 'flex', gap: '12px' }}>
         <button onClick={() => navigate('/signup')}>Go to Sign Up</button>
         <button onClick={() => navigate('/login')}>Go to Login</button>
-        <button onClick={handleLogout}>Logout</button>
+        <button onClick={() => signOut(auth).then(() => navigate('/login'))}>Logout</button>
       </div>
 
-      <div style={styles.board}>
-        {statuses.map((status) => (
-          <div key={status} style={styles.column}>
-            <h3 style={styles.header}>
-              {status} ({applications.filter(app => app.status === status).length})
-            </h3>
-            {applications
-              .filter(app => app.status === status)
-              .map((app) => (
-                <div key={app.id} style={styles.card}>
-                  <strong>{app.jobTitle}</strong> @ {app.company}
-                  <p>{app.companyDescription}</p>
-                  <div style={styles.footer}>
-                    <a href={app.url} target="_blank" rel="noreferrer">Job Link</a>
-                    <button onClick={() => handleDelete(app.id)} style={styles.delete}>🗑️</button>
-                  </div>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div style={styles.board}>
+          {statuses.map((status) => (
+            <Droppable droppableId={status} key={status}>
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  style={styles.column}
+                >
+                  <h3 style={styles.header}>
+                    {status} ({applications.filter(app => app.status === status).length})
+                  </h3>
+                  {applications
+                    .filter(app => app.status === status)
+                    .map((app, index) => (
+                      <Draggable key={app.id} draggableId={app.id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={{ ...styles.card, ...provided.draggableProps.style }}
+                          >
+                            <strong>{app.jobTitle}</strong> @ {app.company}
+                            <p>{app.companyDescription}</p>
+                            <div style={styles.footer}>
+                              <a href={app.url} target="_blank" rel="noreferrer">Job Link</a>
+                              <button onClick={() => handleDelete(app.id)} style={styles.delete}>🗑️</button>
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                  {provided.placeholder}
                 </div>
-              ))}
-          </div>
-        ))}
-      </div>
+              )}
+            </Droppable>
+          ))}
+        </div>
+      </DragDropContext>
     </div>
   );
 };
