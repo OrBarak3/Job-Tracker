@@ -5,6 +5,8 @@ import Dashboard from './Dashboard';
 import Signup from './Signup';
 import Login from './Login';
 import { useAuth } from './AuthContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function PrivateRoute({ element }) {
   const { currentUser } = useAuth();
@@ -20,7 +22,13 @@ function App() {
         <div style={styles.navbar}>
           <Link to="/dashboard" style={styles.link}>Dashboard</Link>
           <Link to="/add" style={styles.link}>Add Application</Link>
-          <button onClick={() => { localStorage.clear(); window.location.reload(); }} style={{ ...styles.link, background: 'none', border: 'none' }}>
+          <button
+            onClick={() => {
+              localStorage.clear();
+              window.location.reload();
+            }}
+            style={{ ...styles.link, background: 'none', border: 'none' }}
+          >
             Log Out
           </button>
         </div>
@@ -35,6 +43,9 @@ function App() {
           <Route path="/add" element={<PrivateRoute element={<AddApplication />} />} />
         </Routes>
       </div>
+
+      {/* ✅ Global toast notifications */}
+      <ToastContainer position="top-center" autoClose={2000} />
     </Router>
   );
 }

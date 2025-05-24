@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { db, auth } from './firebase';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const AddApplication = () => {
   const [form, setForm] = useState({
@@ -12,6 +14,8 @@ const AddApplication = () => {
     url: ''
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -21,7 +25,7 @@ const AddApplication = () => {
 
     const user = auth.currentUser;
     if (!user) {
-      alert("You must be logged in to submit an application.");
+      toast.error("You must be logged in to submit an application.");
       return;
     }
 
@@ -38,39 +42,75 @@ const AddApplication = () => {
           createdAt: Timestamp.now()
         }
       );
-      alert("Application added!");
 
-      // Reset form
-      setForm({
-        company: '',
-        jobTitle: '',
-        companyDescription: '',
-        submissionDate: '',
-        status: 'Submitted',
-        url: ''
-      });
+      toast.success("Application added!");
+
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 2000);
     } catch (err) {
       console.error("Error adding application:", err);
-      alert("Error adding application. See console for details.");
+      toast.error("Failed to add application. See console.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '500px' }}>
-      <input name="company" placeholder="Company Name" value={form.company} onChange={handleChange} required />
-      <input name="jobTitle" placeholder="Job Title" value={form.jobTitle} onChange={handleChange} required />
-      <textarea name="companyDescription" placeholder="Company Description" value={form.companyDescription} onChange={handleChange} />
-      <input type="datetime-local" name="submissionDate" value={form.submissionDate} onChange={handleChange} required />
-      <select name="status" value={form.status} onChange={handleChange}>
-        <option>Submitted</option>
-        <option>Responded</option>
-        <option>Interview</option>
-        <option>Offer</option>
-        <option>Rejected</option>
-      </select>
-      <input name="url" placeholder="Job Posting URL" value={form.url} onChange={handleChange} />
-      <button type="submit">Submit</button>
-    </form>
+    <div className="auth-container">
+      <form onSubmit={handleSubmit} className="auth-box">
+        <h2>Add Application</h2>
+        <input
+          name="company"
+          className="auth-input"
+          placeholder="Company Name"
+          value={form.company}
+          onChange={handleChange}
+          required
+        />
+        <input
+          name="jobTitle"
+          className="auth-input"
+          placeholder="Job Title"
+          value={form.jobTitle}
+          onChange={handleChange}
+          required
+        />
+        <textarea
+          name="companyDescription"
+          className="auth-input"
+          placeholder="Company Description"
+          value={form.companyDescription}
+          onChange={handleChange}
+        />
+        <input
+          type="datetime-local"
+          name="submissionDate"
+          className="auth-input"
+          value={form.submissionDate}
+          onChange={handleChange}
+          required
+        />
+        <select
+          name="status"
+          className="auth-input"
+          value={form.status}
+          onChange={handleChange}
+        >
+          <option>Submitted</option>
+          <option>Responded</option>
+          <option>Interview</option>
+          <option>Offer</option>
+          <option>Rejected</option>
+        </select>
+        <input
+          name="url"
+          className="auth-input"
+          placeholder="Job Posting URL"
+          value={form.url}
+          onChange={handleChange}
+        />
+        <button type="submit" className="auth-button">Submit</button>
+      </form>
+    </div>
   );
 };
 
