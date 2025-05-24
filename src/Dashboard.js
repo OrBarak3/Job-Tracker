@@ -7,7 +7,7 @@ import {
   doc,
   deleteDoc
 } from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
+//import { signOut } from 'firebase/auth';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -17,7 +17,7 @@ const statuses = ['Submitted', 'Responded', 'Interview', 'Offer', 'Rejected'];
 
 const Dashboard = () => {
   const [applications, setApplications] = useState([]);
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   useEffect(() => {
     const fetchApplications = async () => {
