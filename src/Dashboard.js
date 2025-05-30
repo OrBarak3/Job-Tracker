@@ -131,6 +131,12 @@ const Dashboard = () => {
                               {app.jobTitle} @ {app.company}
                             </div>
 
+                            {app.date && (
+                              <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '4px' }}>
+                                {new Date(app.date.seconds * 1000).toLocaleDateString('he-IL')}
+                              </div>
+                            )}
+
                             {expandedId === app.id && (
                               <div
                                 style={{ marginTop: '8px' }}

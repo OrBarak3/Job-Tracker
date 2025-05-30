@@ -36,7 +36,7 @@ const AddApplication = () => {
           company: form.company,
           jobTitle: form.jobTitle,
           companyDescription: form.companyDescription,
-          submissionDate: form.submissionDate,
+          date: Timestamp.fromDate(new Date(form.submissionDate)), // 👈 store as Firestore Timestamp
           status: form.status,
           url: form.url,
           createdAt: Timestamp.now()
