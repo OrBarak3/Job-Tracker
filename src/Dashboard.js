@@ -7,16 +7,14 @@ import {
   doc,
   deleteDoc
 } from 'firebase/firestore';
-//import { signOut } from 'firebase/auth';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { toast } from 'react-toastify';
-
 
 const statuses = ['Submitted', 'Responded', 'Interview', 'Offer', 'Rejected'];
 
 const Dashboard = () => {
   const [applications, setApplications] = useState([]);
-  //const navigate = useNavigate();
+  const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -29,55 +27,54 @@ const Dashboard = () => {
     fetchApplications();
   }, []);
 
-const handleDelete = (id) => {
-  toast.info(
-    <div>
-      <strong>Delete this application?</strong>
-      <div style={{ marginTop: '8px', display: 'flex', gap: '8px' }}>
-        <button
-          onClick={async () => {
-            toast.dismiss(); // close the toast
-            try {
-              await deleteDoc(doc(db, `users/${auth.currentUser.uid}/applications`, id));
-              setApplications(prev => prev.filter(app => app.id !== id));
-              toast.success("Application deleted.");
-            } catch (err) {
-              console.error("Error deleting application:", err);
-              toast.error("Failed to delete.");
-            }
-          }}
-          style={{
-            backgroundColor: '#dc3545',
-            color: 'white',
-            border: 'none',
-            padding: '4px 10px',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
-        >
-          Yes
-        </button>
-        <button
-          onClick={() => toast.dismiss()}
-          style={{
-            backgroundColor: '#6c757d',
-            color: 'white',
-            border: 'none',
-            padding: '4px 10px',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
-        >
-          No
-        </button>
-      </div>
-    </div>,
-    { autoClose: false }
-  );
-};
-
+  const handleDelete = (id) => {
+    toast.info(
+      <div>
+        <strong>Delete this application?</strong>
+        <div style={{ marginTop: '8px', display: 'flex', gap: '8px' }}>
+          <button
+            onClick={async () => {
+              toast.dismiss();
+              try {
+                await deleteDoc(doc(db, `users/${auth.currentUser.uid}/applications`, id));
+                setApplications(prev => prev.filter(app => app.id !== id));
+                toast.success("Application deleted.");
+              } catch (err) {
+                console.error("Error deleting application:", err);
+                toast.error("Failed to delete.");
+              }
+            }}
+            style={{
+              backgroundColor: '#dc3545',
+              color: 'white',
+              border: 'none',
+              padding: '4px 10px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => toast.dismiss()}
+            style={{
+              backgroundColor: '#6c757d',
+              color: 'white',
+              border: 'none',
+              padding: '4px 10px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+          >
+            No
+          </button>
+        </div>
+      </div>,
+      { autoClose: false }
+    );
+  };
 
   const onDragEnd = async (result) => {
     const { source, destination, draggableId } = result;
@@ -92,9 +89,12 @@ const handleDelete = (id) => {
 
     setApplications(updated);
 
-    // Update Firestore
     const docRef = doc(db, `users/${auth.currentUser.uid}/applications`, draggableId);
     await updateDoc(docRef, { status: destination.droppableId });
+  };
+
+  const toggleExpanded = (id) => {
+    setExpandedId(prev => (prev === id ? null : id));
   };
 
   return (
@@ -124,8 +124,20 @@ const handleDelete = (id) => {
                             {...provided.dragHandleProps}
                             style={{ ...styles.card, ...provided.draggableProps.style }}
                           >
-                            <strong>{app.jobTitle}</strong> @ {app.company}
-                            <p>{app.companyDescription}</p>
+                            <div
+                              onClick={() => toggleExpanded(app.id)}
+                              style={{ cursor: 'pointer', fontWeight: 'bold' }}
+                            >
+                              {app.jobTitle} @ {app.company}
+                            </div>
+
+                            {expandedId === app.id && (
+                              <div
+                                style={{ marginTop: '8px' }}
+                                dangerouslySetInnerHTML={{ __html: app.companyDescription }}
+                              />
+                            )}
+
                             <div style={styles.footer}>
                               <a href={app.url} target="_blank" rel="noreferrer">Job Link</a>
                               <button onClick={() => handleDelete(app.id)} style={styles.delete}>🗑️</button>
