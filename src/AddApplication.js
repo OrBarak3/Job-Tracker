@@ -90,17 +90,18 @@ const AddApplication = () => {
           required
         />
         <select
-          name="status"
-          className="auth-input"
-          value={form.status}
-          onChange={handleChange}
+         name="status"
+         className="auth-input"
+         value={form.status}
+         onChange={handleChange}
         >
-          <option>Submitted</option>
-          <option>Responded</option>
-          <option>Interview</option>
-          <option>Offer</option>
-          <option>Rejected</option>
+         <option>Submitted</option>
+         <option>Home Assignment</option>
+         <option>Technical Interview</option>
+         <option>HR Interview</option>
+         <option>Rejected</option>
         </select>
+
         <input
           name="url"
           className="auth-input"

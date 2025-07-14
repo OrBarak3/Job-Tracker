@@ -19,20 +19,12 @@ function App() {
   return (
     <Router>
       {currentUser && (
-        <div style={styles.navbar}>
-          <Link to="/dashboard" style={styles.link}>Dashboard</Link>
-          <Link to="/add" style={styles.link}>Add Application</Link>
-          <button
-            onClick={() => {
-              localStorage.clear();
-              window.location.reload();
-            }}
-            style={{ ...styles.link, background: 'none', border: 'none' }}
-          >
-            Log Out
-          </button>
-        </div>
-      )}
+       <div style={styles.navbar}>
+         <Link to="/dashboard" style={styles.link}>Dashboard</Link>
+         <Link to="/add" style={styles.link}>Add Application</Link>
+       </div>
+)}
+
 
       <div style={styles.container}>
         <Routes>

@@ -10,7 +10,13 @@ import {
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { toast } from 'react-toastify';
 
-const statuses = ['Submitted', 'Responded', 'Interview', 'Offer', 'Rejected'];
+const statuses = [
+  'Submitted',
+  'Home Assignment',
+  'Technical Interview',
+  'HR Interview',
+  'Rejected'
+];
 
 const Dashboard = () => {
   const [applications, setApplications] = useState([]);
