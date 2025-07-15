@@ -14,36 +14,46 @@ export default function Login() {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/dashboard'); // redirect on success
     } catch (err) {
+      console.error("Login error:", err.code, err.message);
       alert(err.message);
     }
   };
 
   return (
     <div style={styles.container}>
-      <form onSubmit={handleLogin} style={styles.form}>
-        <h2 style={styles.header}>Log In</h2>
-        <input
-          type="email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-          style={styles.input}
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-          style={styles.input}
-        />
-        <button type="submit" style={styles.button}>Log In</button>
-        <p style={styles.text}>
-          Don’t have an account?{' '}
-          <Link to="/signup" style={styles.link}>Sign Up</Link>
-        </p>
-      </form>
+      <div style={styles.inner}>
+        <div style={styles.logo}>
+          Orba <span style={styles.logoAccent}>Job Tracker</span>
+        </div>
+
+        <form onSubmit={handleLogin} style={styles.form}>
+          <h2 style={styles.header}>Log In</h2>
+
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="Email"
+            required
+            style={styles.input}
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="Password"
+            required
+            style={styles.input}
+          />
+
+          <button type="submit" style={styles.button}>Log In</button>
+
+          <p style={styles.text}>
+            Don’t have an account?{' '}
+            <Link to="/signup" style={styles.link}>Sign Up</Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }
@@ -55,6 +65,20 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  inner: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  logo: {
+    fontSize: '28px',
+    fontWeight: 'bold',
+    marginBottom: '24px',
+    color: '#333',
+  },
+  logoAccent: {
+    color: '#007bff',
   },
   form: {
     backgroundColor: 'white',
