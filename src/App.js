@@ -16,15 +16,10 @@ function App() {
   );
 }
 
-function PrivateRoute({ element }) {
-  const { currentUser } = useAuth();
-  return currentUser ? element : <Navigate to="/login" />;
-}
-
 function Main() {
   const { currentUser } = useAuth();
   const location = useLocation();
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
   return (
     <>
@@ -54,6 +49,11 @@ function Main() {
   );
 }
 
+function PrivateRoute({ element }) {
+  const { currentUser } = useAuth();
+  return currentUser ? element : <Navigate to="/login" />;
+}
+
 const styles = {
   navbar: {
     background: '#007bff',
@@ -73,7 +73,8 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'column',
-    paddingBottom: '40px',
+    backgroundColor: '#e8f4fd',
+    paddingBottom: '60px',
   },
   footer: {
     position: 'fixed',
