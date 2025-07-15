@@ -79,6 +79,11 @@ const Dashboard = () => {
     );
   };
 
+  const handleEdit = (app) => {
+    toast.info(`Edit ${app.jobTitle} @ ${app.company} (not implemented yet)`);
+    // In future: open modal or navigate(`/edit/${app.id}`)
+  };
+
   const onDragEnd = async (result) => {
     const { source, destination, draggableId } = result;
     if (!destination || destination.droppableId === source.droppableId) return;
@@ -161,7 +166,10 @@ const Dashboard = () => {
 
                             <div style={styles.footer}>
                               <a href={app.url} target="_blank" rel="noreferrer">Job Link</a>
-                              <button onClick={() => handleDelete(app.id)} style={styles.delete}>🗑️</button>
+                              <div>
+                                <button onClick={() => handleEdit(app)} style={styles.edit}>✏️</button>
+                                <button onClick={() => handleDelete(app.id)} style={styles.delete}>🗑️</button>
+                              </div>
                             </div>
                           </div>
                         )}
@@ -244,6 +252,16 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  edit: {
+    background: '#ffc107',
+    color: 'white',
+    border: 'none',
+    padding: '4px 8px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    marginRight: '6px',
   },
   delete: {
     background: '#dc3545',
