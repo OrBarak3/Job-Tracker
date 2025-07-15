@@ -174,10 +174,6 @@ const Dashboard = () => {
           ))}
         </div>
       </DragDropContext>
-
-      <div style={styles.footerCredit}>
-        Created by Or Barak – <a href="mailto:orbarak1997@gmail.com">orbarak1997@gmail.com</a>
-      </div>
     </div>
   );
 };
