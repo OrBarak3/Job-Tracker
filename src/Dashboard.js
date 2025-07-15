@@ -7,6 +7,8 @@ import {
   doc,
   deleteDoc
 } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { toast } from 'react-toastify';
 
@@ -21,6 +23,7 @@ const statuses = [
 const Dashboard = () => {
   const [applications, setApplications] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -32,6 +35,16 @@ const Dashboard = () => {
     };
     fetchApplications();
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate('/login');
+    } catch (err) {
+      console.error('Logout error:', err);
+      toast.error('Failed to logout');
+    }
+  };
 
   const handleDelete = (id) => {
     toast.info(
@@ -88,8 +101,14 @@ const Dashboard = () => {
 
   return (
     <div style={{ padding: '1rem' }}>
-      <div style={styles.logo}>
-        Orba <span style={styles.logoAccent}>Job Tracker</span>
+      {/* Header */}
+      <div style={styles.headerRow}>
+        <div style={styles.logo}>
+          Orba <span style={styles.logoAccent}>Job Tracker</span>
+        </div>
+        <button onClick={handleLogout} style={styles.logout}>
+          Log Out
+        </button>
       </div>
 
       <h2>Welcome, {auth.currentUser?.email}</h2>
@@ -158,14 +177,28 @@ const Dashboard = () => {
 };
 
 const styles = {
+  headerRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '16px'
+  },
   logo: {
     fontSize: '26px',
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: '16px',
   },
   logoAccent: {
     color: '#007bff',
+  },
+  logout: {
+    backgroundColor: '#dc3545',
+    color: 'white',
+    border: 'none',
+    padding: '8px 14px',
+    borderRadius: '4px',
+    fontWeight: 'bold',
+    cursor: 'pointer'
   },
   board: {
     display: 'flex',
