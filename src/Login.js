@@ -1,74 +1,121 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
-import AddApplication from './AddApplication';
-import Dashboard from './Dashboard';
-import Signup from './Signup';
-import Login from './Login';
-import { useAuth } from './AuthContext';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useState } from 'react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from './firebase';
+import { useNavigate, Link } from 'react-router-dom';
 
-function App() {
-  return (
-    <Router>
-      <Main />
-    </Router>
-  );
-}
+export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-// ✅ Split this out so we can use useLocation safely inside Router
-function Main() {
-  const { currentUser } = useAuth();
-  const location = useLocation();
-
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Login error:', error);
+      alert(error.message);
+    }
+  };
 
   return (
-    <>
-      {/* ✅ Hide navbar on /login and /signup */}
-      {!isAuthPage && currentUser && (
-        <div style={styles.navbar}>
-          <Link to="/dashboard" style={styles.link}>Dashboard</Link>
-          <Link to="/add" style={styles.link}>Add Application</Link>
+    <div style={styles.container}>
+      <div style={styles.inner}>
+        <div style={styles.logo}>
+          Orba <span style={styles.logoAccent}>Job Tracker</span>
         </div>
-      )}
 
-      <div style={styles.container}>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
-          <Route path="/add" element={<PrivateRoute element={<AddApplication />} />} />
-        </Routes>
+        <form onSubmit={handleLogin} style={styles.form}>
+          <h2 style={styles.header}>Log In</h2>
+
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            style={styles.input}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            style={styles.input}
+            required
+          />
+
+          <button type="submit" style={styles.button}>Log In</button>
+
+          <p style={styles.text}>
+            Don’t have an account? <Link to="/signup" style={styles.link}>Sign Up</Link>
+          </p>
+        </form>
       </div>
-
-      <ToastContainer position="top-center" autoClose={2000} />
-    </>
+    </div>
   );
-}
-
-function PrivateRoute({ element }) {
-  const { currentUser } = useAuth();
-  return currentUser ? element : <Navigate to="/login" />;
 }
 
 const styles = {
-  navbar: {
-    background: '#007bff',
-    padding: '12px',
+  container: {
+    backgroundColor: '#e8f4fd',
+    height: '100vh',
     display: 'flex',
-    gap: '16px',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  link: {
+  inner: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  logo: {
+    fontSize: '28px',
+    fontWeight: 'bold',
+    marginBottom: '24px',
+    color: '#333',
+  },
+  logoAccent: {
+    color: '#007bff',
+  },
+  form: {
+    backgroundColor: 'white',
+    padding: '32px',
+    borderRadius: '10px',
+    boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    width: '300px',
+  },
+  header: {
+    margin: 0,
+    textAlign: 'center',
+    color: '#007bff',
+  },
+  input: {
+    padding: '10px',
+    borderRadius: '5px',
+    border: '1px solid #ccc',
+    fontSize: '16px',
+  },
+  button: {
+    backgroundColor: '#007bff',
     color: 'white',
-    textDecoration: 'none',
+    border: 'none',
+    padding: '10px',
+    borderRadius: '5px',
     fontWeight: 'bold',
     cursor: 'pointer',
   },
-  container: {
-    padding: '24px',
+  text: {
+    fontSize: '14px',
+    textAlign: 'center',
+  },
+  link: {
+    color: '#007bff',
+    textDecoration: 'none',
+    fontWeight: 'bold',
   }
 };
-
-export default App;
