@@ -1,3 +1,4 @@
+// Add this to your imports
 import React, { useEffect, useState } from 'react';
 import { db, auth } from './firebase';
 import {
@@ -23,6 +24,8 @@ const statuses = [
 const Dashboard = () => {
   const [applications, setApplications] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
+  const [editingApp, setEditingApp] = useState(null); // ✅ NEW
+  const [formData, setFormData] = useState({});       // ✅ NEW
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -67,21 +70,13 @@ const Dashboard = () => {
           >
             Yes
           </button>
-          <button
-            onClick={() => toast.dismiss()}
-            style={styles.cancelButton}
-          >
+          <button onClick={() => toast.dismiss()} style={styles.cancelButton}>
             No
           </button>
         </div>
       </div>,
       { autoClose: false }
     );
-  };
-
-  const handleEdit = (app) => {
-    toast.info(`Edit ${app.jobTitle} @ ${app.company} (not implemented yet)`);
-    // In future: open modal or navigate(`/edit/${app.id}`)
   };
 
   const onDragEnd = async (result) => {
@@ -104,15 +99,43 @@ const Dashboard = () => {
     setExpandedId(prev => (prev === id ? null : id));
   };
 
+  const handleEditClick = (app) => {
+    setEditingApp(app.id);
+    setFormData({
+      jobTitle: app.jobTitle || '',
+      company: app.company || '',
+      url: app.url || '',
+      status: app.status || 'Submitted',
+      companyDescription: app.companyDescription || ''
+    });
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await updateDoc(doc(db, `users/${auth.currentUser.uid}/applications`, editingApp), formData);
+      setApplications(prev =>
+        prev.map(app => app.id === editingApp ? { ...app, ...formData } : app)
+      );
+      setEditingApp(null);
+      toast.success("Application updated.");
+    } catch (err) {
+      console.error("Update failed:", err);
+      toast.error("Failed to update application.");
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
   return (
     <div style={styles.wrapper}>
       <div style={styles.headerRow}>
         <div style={styles.logo}>
           Orba <span style={styles.logoAccent}>Job Tracker</span>
         </div>
-        <button onClick={handleLogout} style={styles.logout}>
-          Log Out
-        </button>
+        <button onClick={handleLogout} style={styles.logout}>Log Out</button>
       </div>
 
       <h2 style={styles.welcomeText}>Welcome, {auth.currentUser?.email}</h2>
@@ -130,9 +153,11 @@ const Dashboard = () => {
                   <h3 style={styles.header}>
                     {status} ({applications.filter(app => app.status === status).length})
                   </h3>
+
                   {applications.filter(app => app.status === status).length === 0 && (
                     <p style={styles.emptyText}>No applications yet</p>
                   )}
+
                   {applications
                     .filter(app => app.status === status)
                     .map((app, index) => (
@@ -144,33 +169,47 @@ const Dashboard = () => {
                             {...provided.dragHandleProps}
                             style={{ ...styles.card, ...provided.draggableProps.style }}
                           >
-                            <div
-                              onClick={() => toggleExpanded(app.id)}
-                              style={{ cursor: 'pointer', fontWeight: 'bold' }}
-                            >
-                              {app.jobTitle} @ {app.company}
-                            </div>
-
-                            {app.date && (
-                              <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '4px' }}>
-                                {new Date(app.date.seconds * 1000).toLocaleDateString('he-IL')}
-                              </div>
+                            {editingApp === app.id ? (
+                              <form onSubmit={handleEditSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                <input name="jobTitle" value={formData.jobTitle} onChange={handleChange} placeholder="Job Title" />
+                                <input name="company" value={formData.company} onChange={handleChange} placeholder="Company" />
+                                <input name="url" value={formData.url} onChange={handleChange} placeholder="Job Link" />
+                                <select name="status" value={formData.status} onChange={handleChange}>
+                                  {statuses.map(s => <option key={s}>{s}</option>)}
+                                </select>
+                                <textarea
+                                  name="companyDescription"
+                                  value={formData.companyDescription}
+                                  onChange={handleChange}
+                                  placeholder="Company Description"
+                                />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                                  <button type="submit">Save</button>
+                                  <button type="button" onClick={() => setEditingApp(null)}>Cancel</button>
+                                </div>
+                              </form>
+                            ) : (
+                              <>
+                                <div onClick={() => toggleExpanded(app.id)} style={{ fontWeight: 'bold', cursor: 'pointer' }}>
+                                  {app.jobTitle} @ {app.company}
+                                </div>
+                                {app.date && (
+                                  <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '4px' }}>
+                                    {new Date(app.date.seconds * 1000).toLocaleDateString('he-IL')}
+                                  </div>
+                                )}
+                                {expandedId === app.id && (
+                                  <div style={{ marginTop: '8px' }} dangerouslySetInnerHTML={{ __html: app.companyDescription }} />
+                                )}
+                                <div style={styles.footer}>
+                                  <a href={app.url} target="_blank" rel="noreferrer">Job Link</a>
+                                  <div>
+                                    <button onClick={() => handleEditClick(app)} style={{ marginRight: '6px' }}>✏️</button>
+                                    <button onClick={() => handleDelete(app.id)} style={styles.delete}>🗑️</button>
+                                  </div>
+                                </div>
+                              </>
                             )}
-
-                            {expandedId === app.id && (
-                              <div
-                                style={{ marginTop: '8px' }}
-                                dangerouslySetInnerHTML={{ __html: app.companyDescription }}
-                              />
-                            )}
-
-                            <div style={styles.footer}>
-                              <a href={app.url} target="_blank" rel="noreferrer">Job Link</a>
-                              <div>
-                                <button onClick={() => handleEdit(app)} style={styles.edit}>✏️</button>
-                                <button onClick={() => handleDelete(app.id)} style={styles.delete}>🗑️</button>
-                              </div>
-                            </div>
                           </div>
                         )}
                       </Draggable>
@@ -186,121 +225,6 @@ const Dashboard = () => {
   );
 };
 
-const styles = {
-  wrapper: {
-    padding: '1rem',
-    minHeight: '100vh',
-    backgroundColor: '#eaf6ff'
-  },
-  headerRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '12px'
-  },
-  logo: {
-    fontSize: '26px',
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  logoAccent: {
-    color: '#007bff',
-  },
-  welcomeText: {
-    marginBottom: '20px'
-  },
-  logout: {
-    backgroundColor: '#dc3545',
-    color: 'white',
-    border: 'none',
-    padding: '8px 14px',
-    borderRadius: '4px',
-    fontWeight: 'bold',
-    cursor: 'pointer'
-  },
-  board: {
-    display: 'flex',
-    gap: '16px',
-    overflowX: 'auto',
-  },
-  column: {
-    minWidth: '240px',
-    backgroundColor: '#f4f4f4',
-    padding: '12px',
-    borderRadius: '8px',
-    flex: '1',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center'
-  },
-  header: {
-    textAlign: 'center',
-    marginBottom: '12px',
-    color: '#007bff',
-  },
-  card: {
-    backgroundColor: '#fff',
-    border: '1px solid #ddd',
-    borderRadius: '6px',
-    padding: '8px',
-    marginBottom: '8px',
-    width: '100%',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-  },
-  footer: {
-    marginTop: '12px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  edit: {
-    background: '#ffc107',
-    color: 'white',
-    border: 'none',
-    padding: '4px 8px',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    marginRight: '6px',
-  },
-  delete: {
-    background: '#dc3545',
-    color: 'white',
-    border: 'none',
-    padding: '4px 8px',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '14px',
-  },
-  emptyText: {
-    fontStyle: 'italic',
-    color: '#777',
-    marginTop: '12px'
-  },
-  confirmButton: {
-    backgroundColor: '#dc3545',
-    color: 'white',
-    border: 'none',
-    padding: '4px 10px',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontWeight: 'bold'
-  },
-  cancelButton: {
-    backgroundColor: '#6c757d',
-    color: 'white',
-    border: 'none',
-    padding: '4px 10px',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontWeight: 'bold'
-  },
-  footerCredit: {
-    marginTop: '30px',
-    fontSize: '14px',
-    textAlign: 'left',
-    color: '#666'
-  }
-};
+// Use the same styles you already have and maybe add/edit button styling if needed
 
 export default Dashboard;
