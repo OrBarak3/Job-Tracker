@@ -1,4 +1,3 @@
-// Add this to your imports
 import React, { useEffect, useState } from 'react';
 import { db, auth } from './firebase';
 import {
@@ -24,8 +23,8 @@ const statuses = [
 const Dashboard = () => {
   const [applications, setApplications] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
-  const [editingApp, setEditingApp] = useState(null); // ✅ NEW
-  const [formData, setFormData] = useState({});       // ✅ NEW
+  const [editingApp, setEditingApp] = useState(null);
+  const [formData, setFormData] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -70,7 +69,10 @@ const Dashboard = () => {
           >
             Yes
           </button>
-          <button onClick={() => toast.dismiss()} style={styles.cancelButton}>
+          <button
+            onClick={() => toast.dismiss()}
+            style={styles.cancelButton}
+          >
             No
           </button>
         </div>
@@ -153,11 +155,9 @@ const Dashboard = () => {
                   <h3 style={styles.header}>
                     {status} ({applications.filter(app => app.status === status).length})
                   </h3>
-
                   {applications.filter(app => app.status === status).length === 0 && (
                     <p style={styles.emptyText}>No applications yet</p>
                   )}
-
                   {applications
                     .filter(app => app.status === status)
                     .map((app, index) => (
@@ -204,7 +204,7 @@ const Dashboard = () => {
                                 <div style={styles.footer}>
                                   <a href={app.url} target="_blank" rel="noreferrer">Job Link</a>
                                   <div>
-                                    <button onClick={() => handleEditClick(app)} style={{ marginRight: '6px' }}>✏️</button>
+                                    <button onClick={() => handleEditClick(app)} style={styles.edit}>✏️</button>
                                     <button onClick={() => handleDelete(app.id)} style={styles.delete}>🗑️</button>
                                   </div>
                                 </div>
@@ -225,6 +225,115 @@ const Dashboard = () => {
   );
 };
 
-// Use the same styles you already have and maybe add/edit button styling if needed
+const styles = {
+  wrapper: {
+    padding: '1rem',
+    minHeight: '100vh',
+    backgroundColor: '#eaf6ff'
+  },
+  headerRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '12px'
+  },
+  logo: {
+    fontSize: '26px',
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  logoAccent: {
+    color: '#007bff',
+  },
+  welcomeText: {
+    marginBottom: '20px'
+  },
+  logout: {
+    backgroundColor: '#dc3545',
+    color: 'white',
+    border: 'none',
+    padding: '8px 14px',
+    borderRadius: '4px',
+    fontWeight: 'bold',
+    cursor: 'pointer'
+  },
+  board: {
+    display: 'flex',
+    gap: '16px',
+    overflowX: 'auto',
+  },
+  column: {
+    minWidth: '240px',
+    backgroundColor: '#f4f4f4',
+    padding: '12px',
+    borderRadius: '8px',
+    flex: '1',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
+  },
+  header: {
+    textAlign: 'center',
+    marginBottom: '12px',
+    color: '#007bff',
+  },
+  card: {
+    backgroundColor: '#fff',
+    border: '1px solid #ddd',
+    borderRadius: '6px',
+    padding: '8px',
+    marginBottom: '8px',
+    width: '100%',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+  },
+  footer: {
+    marginTop: '12px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  edit: {
+    background: '#ffc107',
+    color: 'white',
+    border: 'none',
+    padding: '4px 8px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    marginRight: '6px',
+  },
+  delete: {
+    background: '#dc3545',
+    color: 'white',
+    border: 'none',
+    padding: '4px 8px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px',
+  },
+  emptyText: {
+    fontStyle: 'italic',
+    color: '#777',
+    marginTop: '12px'
+  },
+  confirmButton: {
+    backgroundColor: '#dc3545',
+    color: 'white',
+    border: 'none',
+    padding: '4px 10px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold'
+  },
+  cancelButton: {
+    backgroundColor: '#6c757d',
+    color: 'white',
+    border: 'none',
+    padding: '4px 10px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold'
+  }
+};
 
 export default Dashboard;
