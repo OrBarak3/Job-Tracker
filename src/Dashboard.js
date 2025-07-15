@@ -100,8 +100,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div style={{ padding: '1rem' }}>
-      {/* Header */}
+    <div style={styles.wrapper}>
       <div style={styles.headerRow}>
         <div style={styles.logo}>
           Orba <span style={styles.logoAccent}>Job Tracker</span>
@@ -111,7 +110,7 @@ const Dashboard = () => {
         </button>
       </div>
 
-      <h2>Welcome, {auth.currentUser?.email}</h2>
+      <h2 style={styles.welcomeText}>Welcome, {auth.currentUser?.email}</h2>
 
       <DragDropContext onDragEnd={onDragEnd}>
         <div style={styles.board}>
@@ -126,7 +125,9 @@ const Dashboard = () => {
                   <h3 style={styles.header}>
                     {status} ({applications.filter(app => app.status === status).length})
                   </h3>
-
+                  {applications.filter(app => app.status === status).length === 0 && (
+                    <p style={styles.emptyText}>No applications yet</p>
+                  )}
                   {applications
                     .filter(app => app.status === status)
                     .map((app, index) => (
@@ -166,12 +167,6 @@ const Dashboard = () => {
                         )}
                       </Draggable>
                     ))}
-
-                  {/* Show empty placeholder */}
-                  {applications.filter(app => app.status === status).length === 0 && (
-                    <div style={styles.empty}>No applications yet</div>
-                  )}
-
                   {provided.placeholder}
                 </div>
               )}
@@ -179,16 +174,25 @@ const Dashboard = () => {
           ))}
         </div>
       </DragDropContext>
+
+      <div style={styles.footerCredit}>
+        Created by Or Barak – <a href="mailto:orbarak1997@gmail.com">orbarak1997@gmail.com</a>
+      </div>
     </div>
   );
 };
 
 const styles = {
+  wrapper: {
+    padding: '1rem',
+    minHeight: '100vh',
+    backgroundColor: '#eaf6ff'
+  },
   headerRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '16px'
+    marginBottom: '12px'
   },
   logo: {
     fontSize: '26px',
@@ -197,6 +201,9 @@ const styles = {
   },
   logoAccent: {
     color: '#007bff',
+  },
+  welcomeText: {
+    marginBottom: '20px'
   },
   logout: {
     backgroundColor: '#dc3545',
@@ -211,15 +218,13 @@ const styles = {
     display: 'flex',
     gap: '16px',
     overflowX: 'auto',
-    minHeight: '300px',
-    paddingBottom: '24px',
   },
   column: {
     minWidth: '240px',
     backgroundColor: '#f4f4f4',
     padding: '12px',
     borderRadius: '8px',
-    flexGrow: 1,
+    flex: '1',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center'
@@ -253,10 +258,10 @@ const styles = {
     cursor: 'pointer',
     fontSize: '14px',
   },
-  empty: {
-    fontSize: '14px',
-    color: '#888',
-    marginTop: '8px',
+  emptyText: {
+    fontStyle: 'italic',
+    color: '#777',
+    marginTop: '12px'
   },
   confirmButton: {
     backgroundColor: '#dc3545',
@@ -275,6 +280,12 @@ const styles = {
     borderRadius: '4px',
     cursor: 'pointer',
     fontWeight: 'bold'
+  },
+  footerCredit: {
+    marginTop: '30px',
+    fontSize: '14px',
+    textAlign: 'left',
+    color: '#666'
   }
 };
 
