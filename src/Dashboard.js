@@ -50,29 +50,13 @@ const Dashboard = () => {
                 toast.error("Failed to delete.");
               }
             }}
-            style={{
-              backgroundColor: '#dc3545',
-              color: 'white',
-              border: 'none',
-              padding: '4px 10px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
+            style={styles.confirmButton}
           >
             Yes
           </button>
           <button
             onClick={() => toast.dismiss()}
-            style={{
-              backgroundColor: '#6c757d',
-              color: 'white',
-              border: 'none',
-              padding: '4px 10px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
+            style={styles.cancelButton}
           >
             No
           </button>
@@ -94,7 +78,6 @@ const Dashboard = () => {
     });
 
     setApplications(updated);
-
     const docRef = doc(db, `users/${auth.currentUser.uid}/applications`, draggableId);
     await updateDoc(docRef, { status: destination.droppableId });
   };
@@ -105,7 +88,12 @@ const Dashboard = () => {
 
   return (
     <div style={{ padding: '1rem' }}>
+      <div style={styles.logo}>
+        Orba <span style={styles.logoAccent}>Job Tracker</span>
+      </div>
+
       <h2>Welcome, {auth.currentUser?.email}</h2>
+
       <DragDropContext onDragEnd={onDragEnd}>
         <div style={styles.board}>
           {statuses.map((status) => (
@@ -170,6 +158,15 @@ const Dashboard = () => {
 };
 
 const styles = {
+  logo: {
+    fontSize: '26px',
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: '16px',
+  },
+  logoAccent: {
+    color: '#007bff',
+  },
   board: {
     display: 'flex',
     gap: '16px',
@@ -209,6 +206,24 @@ const styles = {
     borderRadius: '4px',
     cursor: 'pointer',
     fontSize: '14px',
+  },
+  confirmButton: {
+    backgroundColor: '#dc3545',
+    color: 'white',
+    border: 'none',
+    padding: '4px 10px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold'
+  },
+  cancelButton: {
+    backgroundColor: '#6c757d',
+    color: 'white',
+    border: 'none',
+    padding: '4px 10px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold'
   }
 };
 
