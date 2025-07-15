@@ -126,6 +126,7 @@ const Dashboard = () => {
                   <h3 style={styles.header}>
                     {status} ({applications.filter(app => app.status === status).length})
                   </h3>
+
                   {applications
                     .filter(app => app.status === status)
                     .map((app, index) => (
@@ -165,6 +166,12 @@ const Dashboard = () => {
                         )}
                       </Draggable>
                     ))}
+
+                  {/* Show empty placeholder */}
+                  {applications.filter(app => app.status === status).length === 0 && (
+                    <div style={styles.empty}>No applications yet</div>
+                  )}
+
                   {provided.placeholder}
                 </div>
               )}
@@ -204,13 +211,18 @@ const styles = {
     display: 'flex',
     gap: '16px',
     overflowX: 'auto',
+    minHeight: '300px',
+    paddingBottom: '24px',
   },
   column: {
     minWidth: '240px',
     backgroundColor: '#f4f4f4',
     padding: '12px',
     borderRadius: '8px',
-    flex: '1',
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
   },
   header: {
     textAlign: 'center',
@@ -223,6 +235,7 @@ const styles = {
     borderRadius: '6px',
     padding: '8px',
     marginBottom: '8px',
+    width: '100%',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   },
   footer: {
@@ -239,6 +252,11 @@ const styles = {
     borderRadius: '4px',
     cursor: 'pointer',
     fontSize: '14px',
+  },
+  empty: {
+    fontSize: '14px',
+    color: '#888',
+    marginTop: '8px',
   },
   confirmButton: {
     backgroundColor: '#dc3545',
