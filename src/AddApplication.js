@@ -19,15 +19,23 @@ const AddApplication = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Auto-fill company based on URL if empty
     if (name === "url") {
       try {
         const url = new URL(value);
-        const domainParts = url.hostname.split('.');
-        const companyGuess =
-          domainParts.length === 2 ? domainParts[0] : domainParts[domainParts.length - 2];
-        const capitalized =
-          companyGuess.charAt(0).toUpperCase() + companyGuess.slice(1);
+        let companyGuess = "";
+
+        // Known platforms with subdirectory companies
+        if (url.hostname.includes("greenhouse.io") || url.hostname.includes("lever.co")) {
+          const pathParts = url.pathname.split('/').filter(Boolean);
+          companyGuess = pathParts[0]; // e.g., 'residenthome'
+        } else {
+          const domainParts = url.hostname.split('.');
+          companyGuess = domainParts.length === 2
+            ? domainParts[0]
+            : domainParts[domainParts.length - 2]; // e.g., 'greenhouse'
+        }
+
+        const capitalized = companyGuess.charAt(0).toUpperCase() + companyGuess.slice(1);
 
         setForm(prev => ({
           ...prev,
@@ -35,7 +43,6 @@ const AddApplication = () => {
           company: prev.company || capitalized
         }));
       } catch {
-        // fallback in case of invalid URL
         setForm(prev => ({ ...prev, url: value }));
       }
     } else {
