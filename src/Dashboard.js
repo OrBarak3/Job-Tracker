@@ -265,10 +265,9 @@ const styles = {
   justifyContent: 'center',  // <-- center columns nicely
   width: '100%',
 },
-
 column: {
-  flex: '1 1 300px',          // <-- flexible column size
-  maxWidth: '320px',          // <-- prevent overflow
+  flex: '1 1 220px',         // shrink column width
+  maxWidth: '220px',         // also cap max width
   backgroundColor: '#f4f4f4',
   padding: '12px',
   borderRadius: '8px',
