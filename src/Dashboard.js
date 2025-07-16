@@ -252,24 +252,24 @@ const styles = {
     cursor: 'pointer',
     fontSize: '14px',
   },
-  board: {
+board: {
   display: 'flex',
+  justifyContent: 'space-evenly', // distribute columns evenly
   flexWrap: 'nowrap',
-  overflowX: 'auto',
-  width: '100vw', // Full viewport width
-  maxWidth: '100%',
-  paddingBottom: '16px',
+  overflowX: 'hidden', // hide scrollbar
+  width: '100%',
   gap: '8px',
 },
 column: {
-  flex: '0 0 220px', // Fit more columns per row
+  flex: '1',
+  maxWidth: '16.5%', // ~6 columns fit screen without scroll
   backgroundColor: '#f4f4f4',
   padding: '8px',
   borderRadius: '8px',
   display: 'flex',
   flexDirection: 'column',
-  overflow: 'visible',
   fontSize: '13px',
+  overflowY: 'visible', // no scrollbars on column
 },
   header: {
     textAlign: 'center',
@@ -282,11 +282,12 @@ card: {
   backgroundColor: '#fff',
   border: '1px solid #ccc',
   borderRadius: '6px',
-  padding: '8px',
-  marginBottom: '8px',
-  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-  fontSize: '13px',
+  padding: '8px 10px',
+  marginBottom: '10px',
+  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+  fontSize: '14px',
   lineHeight: '1.4',
+  wordBreak: 'break-word',
 },
   footer: {
     marginTop: '10px',
