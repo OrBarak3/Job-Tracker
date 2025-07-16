@@ -231,16 +231,16 @@ const styles = {
     marginBottom: '12px',
   },
   logo: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#333',
-  },
+  fontSize: '30px',
+  fontWeight: 'bold',
+  color: '#333',
+},
   logoAccent: {
     color: '#007bff',
   },
   welcomeText: {
-    marginBottom: '20px',
-    fontSize: '15px',
+  marginBottom: '20px',
+  fontSize: '15px',
   },
   logout: {
     backgroundColor: '#dc3545',
@@ -271,23 +271,24 @@ column: {
   fontSize: '13px',
   overflowY: 'visible', // no scrollbars on column
 },
-  header: {
-    textAlign: 'center',
-    marginBottom: '12px',
-    color: '#007bff',
-    fontWeight: 'bold',
-    fontSize: '15px',
-  },
+header: {
+  textAlign: 'center',
+  marginBottom: '12px',
+  fontSize: '16px',
+  fontWeight: '600',
+  color: '#007bff',
+},
 card: {
   backgroundColor: '#fff',
   border: '1px solid #ccc',
   borderRadius: '6px',
-  padding: '8px 10px',
-  marginBottom: '10px',
-  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-  fontSize: '14px',
-  lineHeight: '1.4',
-  wordBreak: 'break-word',
+  padding: '12px 14px',
+  marginBottom: '12px',
+  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+  fontSize: '15px',
+  lineHeight: '1.6',
+  fontWeight: '500',
+  color: '#111',
 },
   footer: {
     marginTop: '10px',
@@ -314,12 +315,11 @@ card: {
     cursor: 'pointer',
     fontSize: '13px',
   },
-  emptyText: {
-    fontStyle: 'italic',
-    color: '#777',
-    marginTop: '10px',
-    fontSize: '13px',
-  },
+emptyText: {
+  fontStyle: 'italic',
+  color: '#888',
+  fontSize: '14px',
+},
   confirmButton: {
     backgroundColor: '#dc3545',
     color: 'white',
