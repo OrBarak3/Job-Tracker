@@ -252,40 +252,39 @@ const styles = {
     cursor: 'pointer'
   },
   board: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: '8px',
-    width: '100%',
-    overflowX: 'auto',
-  },
-  column: {
-    flex: '1',
-    maxWidth: '160px',
-    backgroundColor: '#f4f4f4',
-    padding: '6px',
-    borderRadius: '6px',
-    display: 'flex',
-    flexDirection: 'column',
-    maxHeight: '85vh',
-    overflowY: 'auto',
-    fontSize: '12px'
-  },
+  display: 'flex',
+  gap: '16px',
+  width: '100%',
+  overflowX: 'auto',
+  paddingBottom: '12px',
+},
+column: {
+  flex: '0 0 240px', // wider columns
+  backgroundColor: '#f4f4f4',
+  padding: '10px',
+  borderRadius: '6px',
+  display: 'flex',
+  flexDirection: 'column',
+  maxHeight: 'auto', // no vertical restriction
+  overflowY: 'visible', // removes scrollbar
+  fontSize: '13px'
+},
   header: {
     textAlign: 'center',
     marginBottom: '8px',
     fontSize: '13px',
     color: '#007bff',
   },
-  card: {
-    backgroundColor: '#fff',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    padding: '6px',
-    marginBottom: '6px',
-    width: '100%',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-    fontSize: '12px',
-  },
+ card: {
+  backgroundColor: '#fff',
+  border: '1px solid #ddd',
+  borderRadius: '6px',
+  padding: '8px',
+  marginBottom: '10px',
+  width: '100%',
+  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+  fontSize: '13px',
+},
   footer: {
     marginTop: '8px',
     display: 'flex',
