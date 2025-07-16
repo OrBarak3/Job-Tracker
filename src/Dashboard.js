@@ -18,7 +18,8 @@ const statuses = [
   'Technical Interview',
   'HR Interview',
   'Rejected After Process',
-  'Rejected Without Response'
+  'Rejected Without Response',
+  'Rejected' // Temporary legacy status to show old data
 ];
 
 const Dashboard = () => {
@@ -230,7 +231,8 @@ const styles = {
   wrapper: {
     padding: '1rem',
     minHeight: '100vh',
-    backgroundColor: '#eaf6ff'
+    backgroundColor: '#eaf6ff',
+    overflowX: 'hidden'
   },
   headerRow: {
     display: 'flex',
@@ -258,23 +260,23 @@ const styles = {
     fontWeight: 'bold',
     cursor: 'pointer'
   },
- board: {
-  display: 'flex',
-  flexWrap: 'wrap',          // <-- allow wrapping
-  gap: '16px',
-  justifyContent: 'center',  // <-- center columns nicely
-  width: '100%',
-},
-column: {
-  flex: '1 1 220px',         // shrink column width
-  maxWidth: '220px',         // also cap max width
-  backgroundColor: '#f4f4f4',
-  padding: '12px',
-  borderRadius: '8px',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-},
+  board: {
+    display: 'flex',
+    gap: '16px',
+    overflowX: 'auto',
+    paddingBottom: '12px'
+  },
+  column: {
+    flex: '0 0 auto',
+    minWidth: '230px',
+    maxWidth: '260px',
+    backgroundColor: '#f4f4f4',
+    padding: '12px',
+    borderRadius: '8px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
   header: {
     textAlign: 'center',
     marginBottom: '12px',
