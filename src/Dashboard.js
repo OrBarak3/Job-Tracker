@@ -17,7 +17,8 @@ const statuses = [
   'Home Assignment',
   'Technical Interview',
   'HR Interview',
-  'Rejected'
+  'Rejected After Process',
+  'Rejected Without Response'
 ];
 
 const Dashboard = () => {

@@ -17,7 +17,30 @@ const AddApplication = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    // Auto-fill company based on URL if empty
+    if (name === "url") {
+      try {
+        const url = new URL(value);
+        const domainParts = url.hostname.split('.');
+        const companyGuess =
+          domainParts.length === 2 ? domainParts[0] : domainParts[domainParts.length - 2];
+        const capitalized =
+          companyGuess.charAt(0).toUpperCase() + companyGuess.slice(1);
+
+        setForm(prev => ({
+          ...prev,
+          url: value,
+          company: prev.company || capitalized
+        }));
+      } catch {
+        // fallback in case of invalid URL
+        setForm(prev => ({ ...prev, url: value }));
+      }
+    } else {
+      setForm(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -36,7 +59,7 @@ const AddApplication = () => {
           company: form.company,
           jobTitle: form.jobTitle,
           companyDescription: form.companyDescription,
-          date: Timestamp.fromDate(new Date(form.submissionDate)), // 👈 store as Firestore Timestamp
+          date: Timestamp.fromDate(new Date(form.submissionDate)),
           status: form.status,
           url: form.url,
           createdAt: Timestamp.now()
@@ -44,10 +67,7 @@ const AddApplication = () => {
       );
 
       toast.success("Application added!");
-
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 2000);
+      setTimeout(() => navigate('/dashboard'), 2000);
     } catch (err) {
       console.error("Error adding application:", err);
       toast.error("Failed to add application. See console.");
@@ -58,6 +78,7 @@ const AddApplication = () => {
     <div className="auth-container">
       <form onSubmit={handleSubmit} className="auth-box">
         <h2>Add Application</h2>
+
         <input
           name="company"
           className="auth-input"
@@ -90,18 +111,18 @@ const AddApplication = () => {
           required
         />
         <select
-         name="status"
-         className="auth-input"
-         value={form.status}
-         onChange={handleChange}
+          name="status"
+          className="auth-input"
+          value={form.status}
+          onChange={handleChange}
         >
-         <option>Submitted</option>
-         <option>Home Assignment</option>
-         <option>Technical Interview</option>
-         <option>HR Interview</option>
-         <option>Rejected</option>
+          <option>Submitted</option>
+          <option>Home Assignment</option>
+          <option>Technical Interview</option>
+          <option>HR Interview</option>
+          <option>Rejected (No Interview)</option>
+          <option>Rejected (After Interview)</option>
         </select>
-
         <input
           name="url"
           className="auth-input"
