@@ -44,7 +44,6 @@ const Dashboard = () => {
       await signOut(auth);
       navigate('/login');
     } catch (err) {
-      console.error('Logout error:', err);
       toast.error('Failed to logout');
     }
   };
@@ -62,7 +61,6 @@ const Dashboard = () => {
                 setApplications(prev => prev.filter(app => app.id !== id));
                 toast.success("Application deleted.");
               } catch (err) {
-                console.error("Error deleting application:", err);
                 toast.error("Failed to delete.");
               }
             }}
@@ -117,7 +115,6 @@ const Dashboard = () => {
       setEditingApp(null);
       toast.success("Application updated.");
     } catch (err) {
-      console.error("Update failed:", err);
       toast.error("Failed to update application.");
     }
   };
@@ -341,3 +338,5 @@ const styles = {
     fontSize: '12px'
   }
 };
+
+export default Dashboard;
