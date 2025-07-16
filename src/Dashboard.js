@@ -219,18 +219,18 @@ const Dashboard = () => {
 
 const styles = {
   wrapper: {
-    padding: '0.5rem',
+    padding: '1rem',
     minHeight: '100vh',
-    backgroundColor: '#eaf6ff'
+    backgroundColor: '#eaf6ff',
   },
   headerRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '8px'
+    marginBottom: '12px',
   },
   logo: {
-    fontSize: '20px',
+    fontSize: '24px',
     fontWeight: 'bold',
     color: '#333',
   },
@@ -238,55 +238,54 @@ const styles = {
     color: '#007bff',
   },
   welcomeText: {
-    marginBottom: '12px',
-    fontSize: '14px'
+    marginBottom: '20px',
+    fontSize: '15px',
   },
   logout: {
     backgroundColor: '#dc3545',
     color: 'white',
     border: 'none',
-    padding: '6px 10px',
+    padding: '8px 14px',
     borderRadius: '4px',
     fontWeight: 'bold',
-    fontSize: '12px',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    fontSize: '14px',
   },
   board: {
-  display: 'flex',
-  gap: '16px',
-  width: '100%',
-  overflowX: 'auto',
-  paddingBottom: '12px',
-},
-column: {
-  flex: '0 0 240px', // wider columns
-  backgroundColor: '#f4f4f4',
-  padding: '10px',
-  borderRadius: '6px',
-  display: 'flex',
-  flexDirection: 'column',
-  maxHeight: 'auto', // no vertical restriction
-  overflowY: 'visible', // removes scrollbar
-  fontSize: '13px'
-},
+    display: 'flex',
+    gap: '16px',
+    overflowX: 'auto',
+    paddingBottom: '16px',
+    width: '100%',
+  },
+  column: {
+    flex: '0 0 240px',
+    backgroundColor: '#f4f4f4',
+    padding: '12px',
+    borderRadius: '8px',
+    display: 'flex',
+    flexDirection: 'column',
+    overflowY: 'visible', // ✅ No vertical scroll
+    fontSize: '14px',
+  },
   header: {
     textAlign: 'center',
-    marginBottom: '8px',
-    fontSize: '13px',
+    marginBottom: '12px',
     color: '#007bff',
+    fontWeight: 'bold',
   },
- card: {
-  backgroundColor: '#fff',
-  border: '1px solid #ddd',
-  borderRadius: '6px',
-  padding: '8px',
-  marginBottom: '10px',
-  width: '100%',
-  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-  fontSize: '13px',
-},
+  card: {
+    backgroundColor: '#fff',
+    border: '1px solid #ccc',
+    borderRadius: '6px',
+    padding: '10px',
+    marginBottom: '10px',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+    fontSize: '14px',
+    lineHeight: '1.5',
+  },
   footer: {
-    marginTop: '8px',
+    marginTop: '10px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -295,47 +294,47 @@ column: {
     background: '#ffc107',
     color: 'white',
     border: 'none',
-    padding: '2px 6px',
+    padding: '4px 8px',
     borderRadius: '4px',
     cursor: 'pointer',
-    fontSize: '12px',
-    marginRight: '4px',
+    fontSize: '13px',
+    marginRight: '6px',
   },
   delete: {
     background: '#dc3545',
     color: 'white',
     border: 'none',
-    padding: '2px 6px',
+    padding: '4px 8px',
     borderRadius: '4px',
     cursor: 'pointer',
-    fontSize: '12px',
+    fontSize: '13px',
   },
   emptyText: {
     fontStyle: 'italic',
     color: '#777',
-    marginTop: '8px',
-    fontSize: '11px'
+    marginTop: '10px',
+    fontSize: '13px',
   },
   confirmButton: {
     backgroundColor: '#dc3545',
     color: 'white',
     border: 'none',
-    padding: '4px 8px',
+    padding: '4px 10px',
     borderRadius: '4px',
     cursor: 'pointer',
     fontWeight: 'bold',
-    fontSize: '12px'
+    fontSize: '13px',
   },
   cancelButton: {
     backgroundColor: '#6c757d',
     color: 'white',
     border: 'none',
-    padding: '4px 8px',
+    padding: '4px 10px',
     borderRadius: '4px',
     cursor: 'pointer',
     fontWeight: 'bold',
-    fontSize: '12px'
-  }
+    fontSize: '13px',
+  },
 };
 
 export default Dashboard;
