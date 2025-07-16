@@ -222,7 +222,7 @@ const Dashboard = () => {
 
 const styles = {
   wrapper: {
-    padding: '1rem',
+    padding: '0.5rem',
     minHeight: '100vh',
     backgroundColor: '#eaf6ff'
   },
@@ -230,10 +230,10 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '12px'
+    marginBottom: '8px'
   },
   logo: {
-    fontSize: '26px',
+    fontSize: '20px',
     fontWeight: 'bold',
     color: '#333',
   },
@@ -241,48 +241,56 @@ const styles = {
     color: '#007bff',
   },
   welcomeText: {
-    marginBottom: '20px'
+    marginBottom: '12px',
+    fontSize: '14px'
   },
   logout: {
     backgroundColor: '#dc3545',
     color: 'white',
     border: 'none',
-    padding: '8px 14px',
+    padding: '6px 10px',
     borderRadius: '4px',
     fontWeight: 'bold',
+    fontSize: '12px',
     cursor: 'pointer'
   },
   board: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: '16px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    gap: '8px',
     width: '100%',
+    overflowX: 'auto',
   },
   column: {
+    flex: '1',
+    maxWidth: '160px',
     backgroundColor: '#f4f4f4',
-    padding: '12px',
-    borderRadius: '8px',
+    padding: '6px',
+    borderRadius: '6px',
     display: 'flex',
     flexDirection: 'column',
     maxHeight: '85vh',
-    overflowY: 'auto'
+    overflowY: 'auto',
+    fontSize: '12px'
   },
   header: {
     textAlign: 'center',
-    marginBottom: '12px',
+    marginBottom: '8px',
+    fontSize: '13px',
     color: '#007bff',
   },
   card: {
     backgroundColor: '#fff',
     border: '1px solid #ddd',
-    borderRadius: '6px',
-    padding: '8px',
-    marginBottom: '8px',
+    borderRadius: '5px',
+    padding: '6px',
+    marginBottom: '6px',
     width: '100%',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+    fontSize: '12px',
   },
   footer: {
-    marginTop: '12px',
+    marginTop: '8px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -291,44 +299,45 @@ const styles = {
     background: '#ffc107',
     color: 'white',
     border: 'none',
-    padding: '4px 8px',
+    padding: '2px 6px',
     borderRadius: '4px',
     cursor: 'pointer',
-    fontSize: '14px',
-    marginRight: '6px',
+    fontSize: '12px',
+    marginRight: '4px',
   },
   delete: {
     background: '#dc3545',
     color: 'white',
     border: 'none',
-    padding: '4px 8px',
+    padding: '2px 6px',
     borderRadius: '4px',
     cursor: 'pointer',
-    fontSize: '14px',
+    fontSize: '12px',
   },
   emptyText: {
     fontStyle: 'italic',
     color: '#777',
-    marginTop: '12px'
+    marginTop: '8px',
+    fontSize: '11px'
   },
   confirmButton: {
     backgroundColor: '#dc3545',
     color: 'white',
     border: 'none',
-    padding: '4px 10px',
+    padding: '4px 8px',
     borderRadius: '4px',
     cursor: 'pointer',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    fontSize: '12px'
   },
   cancelButton: {
     backgroundColor: '#6c757d',
     color: 'white',
     border: 'none',
-    padding: '4px 10px',
+    padding: '4px 8px',
     borderRadius: '4px',
     cursor: 'pointer',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    fontSize: '12px'
   }
 };
-
-export default Dashboard;
