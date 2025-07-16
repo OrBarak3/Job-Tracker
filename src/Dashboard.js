@@ -18,8 +18,7 @@ const statuses = [
   'Technical Interview',
   'HR Interview',
   'Rejected After Process',
-  'Rejected Without Response',
-  'Rejected' // Temporary legacy status to show old data
+  'Rejected Without Response'
 ];
 
 const Dashboard = () => {
@@ -71,10 +70,7 @@ const Dashboard = () => {
           >
             Yes
           </button>
-          <button
-            onClick={() => toast.dismiss()}
-            style={styles.cancelButton}
-          >
+          <button onClick={() => toast.dismiss()} style={styles.cancelButton}>
             No
           </button>
         </div>
@@ -87,12 +83,9 @@ const Dashboard = () => {
     const { source, destination, draggableId } = result;
     if (!destination || destination.droppableId === source.droppableId) return;
 
-    const updated = applications.map(app => {
-      if (app.id === draggableId) {
-        return { ...app, status: destination.droppableId };
-      }
-      return app;
-    });
+    const updated = applications.map(app =>
+      app.id === draggableId ? { ...app, status: destination.droppableId } : app
+    );
 
     setApplications(updated);
     const docRef = doc(db, `users/${auth.currentUser.uid}/applications`, draggableId);
@@ -231,8 +224,7 @@ const styles = {
   wrapper: {
     padding: '1rem',
     minHeight: '100vh',
-    backgroundColor: '#eaf6ff',
-    overflowX: 'hidden'
+    backgroundColor: '#eaf6ff'
   },
   headerRow: {
     display: 'flex',
@@ -261,21 +253,19 @@ const styles = {
     cursor: 'pointer'
   },
   board: {
-    display: 'flex',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
     gap: '16px',
-    overflowX: 'auto',
-    paddingBottom: '12px'
+    width: '100%',
   },
   column: {
-    flex: '0 0 auto',
-    minWidth: '230px',
-    maxWidth: '260px',
     backgroundColor: '#f4f4f4',
     padding: '12px',
     borderRadius: '8px',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
+    maxHeight: '85vh',
+    overflowY: 'auto'
   },
   header: {
     textAlign: 'center',
