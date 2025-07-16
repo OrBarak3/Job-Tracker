@@ -258,21 +258,24 @@ const styles = {
     fontWeight: 'bold',
     cursor: 'pointer'
   },
-  board: {
-    display: 'flex',
-    gap: '16px',
-    overflowX: 'auto',
-  },
-  column: {
-    minWidth: '240px',
-    backgroundColor: '#f4f4f4',
-    padding: '12px',
-    borderRadius: '8px',
-    flex: '1',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center'
-  },
+ board: {
+  display: 'flex',
+  flexWrap: 'wrap',          // <-- allow wrapping
+  gap: '16px',
+  justifyContent: 'center',  // <-- center columns nicely
+  width: '100%',
+},
+
+column: {
+  flex: '1 1 300px',          // <-- flexible column size
+  maxWidth: '320px',          // <-- prevent overflow
+  backgroundColor: '#f4f4f4',
+  padding: '12px',
+  borderRadius: '8px',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+},
   header: {
     textAlign: 'center',
     marginBottom: '12px',
