@@ -253,22 +253,24 @@ const styles = {
     fontSize: '14px',
   },
   board: {
-    display: 'flex',
-    flexWrap: 'nowrap',
-    overflowX: 'auto',
-    paddingBottom: '16px',
-    gap: '16px',
-  },
-  column: {
-    flex: '0 0 260px', // Fixed width, won't shrink
-    backgroundColor: '#f4f4f4',
-    padding: '12px',
-    borderRadius: '8px',
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'visible', // ✅ prevent inner scroll
-    fontSize: '14px',
-  },
+  display: 'flex',
+  flexWrap: 'nowrap',
+  overflowX: 'auto',
+  width: '100vw', // Full viewport width
+  maxWidth: '100%',
+  paddingBottom: '16px',
+  gap: '8px',
+},
+column: {
+  flex: '0 0 220px', // Fit more columns per row
+  backgroundColor: '#f4f4f4',
+  padding: '8px',
+  borderRadius: '8px',
+  display: 'flex',
+  flexDirection: 'column',
+  overflow: 'visible',
+  fontSize: '13px',
+},
   header: {
     textAlign: 'center',
     marginBottom: '12px',
@@ -276,17 +278,16 @@ const styles = {
     fontWeight: 'bold',
     fontSize: '15px',
   },
-  card: {
-    backgroundColor: '#fff',
-    border: '1px solid #ccc',
-    borderRadius: '6px',
-    padding: '10px',
-    marginBottom: '10px',
-    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-    fontSize: '14px',
-    lineHeight: '1.6',
-    wordWrap: 'break-word',
-  },
+card: {
+  backgroundColor: '#fff',
+  border: '1px solid #ccc',
+  borderRadius: '6px',
+  padding: '8px',
+  marginBottom: '8px',
+  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+  fontSize: '13px',
+  lineHeight: '1.4',
+},
   footer: {
     marginTop: '10px',
     display: 'flex',
