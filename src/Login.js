@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInAnonymously } from 'firebase/auth';
 import { auth } from './firebase';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -15,6 +15,16 @@ export default function Login() {
       navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
+      alert(error.message);
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    try {
+      await signInAnonymously(auth);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Guest login error:', error);
       alert(error.message);
     }
   };
@@ -47,6 +57,11 @@ export default function Login() {
           />
 
           <button type="submit" style={styles.button}>Log In</button>
+
+          <button type="button" onClick={handleGuestLogin} style={styles.guestButton}>
+            Continue as guest
+          </button>
+          <p style={styles.guestNote}>(your data won't be saved though)</p>
 
           <p style={styles.text}>
             Don’t have an account? <Link to="/signup" style={styles.link}>Sign Up</Link>
@@ -108,6 +123,22 @@ const styles = {
     borderRadius: '5px',
     fontWeight: 'bold',
     cursor: 'pointer',
+  },
+  guestButton: {
+    backgroundColor: '#6c757d',
+    color: 'white',
+    border: 'none',
+    padding: '10px',
+    borderRadius: '5px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+  },
+  guestNote: {
+    fontSize: '12px',
+    color: '#888',
+    textAlign: 'center',
+    marginTop: '-10px',
+    marginBottom: '5px',
   },
   text: {
     fontSize: '14px',
