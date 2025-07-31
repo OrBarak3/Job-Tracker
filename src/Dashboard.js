@@ -1,16 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { db, auth } from './firebase';
-import {
-  collection,
-  getDocs,
-  updateDoc,
-  doc,
-  deleteDoc
-} from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { toast } from 'react-toastify';
+// ... (imports remain unchanged)
 
 const statuses = [
   'Submitted',
@@ -75,6 +63,20 @@ const Dashboard = () => {
       </div>,
       { autoClose: false }
     );
+  };
+
+  // NEW: Quick move to "Rejected Without Response"
+  const handleQuickReject = async (app) => {
+    try {
+      const docRef = doc(db, `users/${auth.currentUser.uid}/applications`, app.id);
+      await updateDoc(docRef, { status: 'Rejected Without Response' });
+      setApplications(prev =>
+        prev.map(a => a.id === app.id ? { ...a, status: 'Rejected Without Response' } : a)
+      );
+      toast.success("Moved to Rejected Without Response");
+    } catch (err) {
+      toast.error("Failed to update status.");
+    }
   };
 
   const onDragEnd = async (result) => {
@@ -196,6 +198,10 @@ const Dashboard = () => {
                                 <div style={styles.footer}>
                                   <a href={app.url} target="_blank" rel="noreferrer">Job Link</a>
                                   <div>
+                                    {/* NEW: Show reject button only for "Submitted" */}
+                                    {app.status === 'Submitted' && (
+                                      <button onClick={() => handleQuickReject(app)} style={styles.rejectButton}>↘️</button>
+                                    )}
                                     <button onClick={() => handleEditClick(app)} style={styles.edit}>✏️</button>
                                     <button onClick={() => handleDelete(app.id)} style={styles.delete}>🗑️</button>
                                   </div>
@@ -217,129 +223,17 @@ const Dashboard = () => {
   );
 };
 
-const styles = {
-  wrapper: {
-    padding: '1rem',
-    minHeight: '100vh',
-    backgroundColor: '#eaf6ff',
-    overflowX: 'hidden',
-  },
-  headerRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '12px',
-  },
-  logo: {
-  fontSize: '30px',
-  fontWeight: 'bold',
-  color: '#333',
-},
-  logoAccent: {
-    color: '#007bff',
-  },
-  welcomeText: {
-  marginBottom: '20px',
-  fontSize: '15px',
-  },
-  logout: {
-    backgroundColor: '#dc3545',
-    color: 'white',
-    border: 'none',
-    padding: '8px 14px',
-    borderRadius: '4px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    fontSize: '14px',
-  },
-board: {
-  display: 'flex',
-  justifyContent: 'space-evenly', // distribute columns evenly
-  flexWrap: 'nowrap',
-  overflowX: 'hidden', // hide scrollbar
-  width: '100%',
-  gap: '8px',
-},
-column: {
-  flex: '1',
-  maxWidth: '16.5%', // ~6 columns fit screen without scroll
-  backgroundColor: '#f4f4f4',
-  padding: '8px',
-  borderRadius: '8px',
-  display: 'flex',
-  flexDirection: 'column',
+// ... existing styles
+
+styles.rejectButton = {
+  background: '#6c63ff',
+  color: 'white',
+  border: 'none',
+  padding: '4px 8px',
+  borderRadius: '4px',
+  cursor: 'pointer',
   fontSize: '13px',
-  overflowY: 'visible', // no scrollbars on column
-},
-header: {
-  textAlign: 'center',
-  marginBottom: '12px',
-  fontSize: '16px',
-  fontWeight: '600',
-  color: '#007bff',
-},
-card: {
-  backgroundColor: '#fff',
-  border: '1px solid #ccc',
-  borderRadius: '6px',
-  padding: '12px 14px',
-  marginBottom: '12px',
-  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-  fontSize: '15px',
-  lineHeight: '1.6',
-  fontWeight: '500',
-  color: '#111',
-},
-  footer: {
-    marginTop: '10px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  edit: {
-    background: '#ffc107',
-    color: 'white',
-    border: 'none',
-    padding: '4px 8px',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '13px',
-    marginRight: '6px',
-  },
-  delete: {
-    background: '#dc3545',
-    color: 'white',
-    border: 'none',
-    padding: '4px 8px',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '13px',
-  },
-emptyText: {
-  fontStyle: 'italic',
-  color: '#888',
-  fontSize: '14px',
-},
-  confirmButton: {
-    backgroundColor: '#dc3545',
-    color: 'white',
-    border: 'none',
-    padding: '4px 10px',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    fontSize: '13px',
-  },
-  cancelButton: {
-    backgroundColor: '#6c757d',
-    color: 'white',
-    border: 'none',
-    padding: '4px 10px',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    fontSize: '13px',
-  },
+  marginRight: '6px',
 };
 
 export default Dashboard;
