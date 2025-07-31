@@ -29,9 +29,11 @@ const Dashboard = () => {
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
 
+  const isGuest = auth.currentUser?.isAnonymous;
+
   useEffect(() => {
     const fetchApplications = async () => {
-      if (!auth.currentUser) return;
+      if (!auth.currentUser || auth.currentUser.isAnonymous) return;
       const q = collection(db, `users/${auth.currentUser.uid}/applications`);
       const snapshot = await getDocs(q);
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -147,6 +149,11 @@ const Dashboard = () => {
       </div>
 
       <h2 style={styles.welcomeText}>Welcome, {auth.currentUser?.email}</h2>
+      {isGuest && (
+        <div style={{ textAlign: 'center', color: '#888', marginBottom: '10px' }}>
+          You're in guest mode – your data won't be saved.
+        </div>
+      )}
 
       <DragDropContext onDragEnd={onDragEnd}>
         <div style={styles.board}>
