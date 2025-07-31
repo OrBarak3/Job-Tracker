@@ -20,15 +20,14 @@ export default function Login() {
   };
 
   const handleGuestLogin = async () => {
-  try {
-    await signInAnonymously(auth);
-    navigate('/dashboard');
-  } catch (error) {
-    console.error('Guest login error:', error);
-    alert(error.message);
-  }
-};
-
+    try {
+      await signInAnonymously(auth);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Guest login error:', error);
+      alert(error.message);
+    }
+  };
 
   return (
     <div style={styles.container}>
