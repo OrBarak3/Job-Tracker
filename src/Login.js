@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword, signInAnonymously } from 'firebase/auth';
 import { auth } from './firebase';
 import { useNavigate, Link } from 'react-router-dom';
+import { signInAnonymously } from 'firebase/auth';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -19,8 +20,14 @@ export default function Login() {
     }
   };
 
-  const handleGuestLogin = () => {
-  navigate('/dashboard');
+  const handleGuestLogin = async () => {
+  try {
+    await signInAnonymously(auth);
+    navigate('/dashboard');
+  } catch (error) {
+    console.error('Guest login error:', error);
+    alert(error.message);
+  }
 };
 
 
