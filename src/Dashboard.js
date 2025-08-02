@@ -29,38 +29,48 @@ const Dashboard = () => {
   const [editingApp, setEditingApp] = useState(null);
   const [formData, setFormData] = useState({});
   const [currentUser, setCurrentUser] = useState(null);
-  const [userFirstName, setUserFirstName] = useState(null); // New state for first name
+  const [userFirstName, setUserFirstName] = useState(null);
   const navigate = useNavigate();
   const isGuest = currentUser?.isAnonymous;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
+      setUserFirstName(null); // Reset first name on user change
 
       if (user) {
+        // --- ADDITIONAL SAFETY: Ensure UID is present before querying ---
+        if (!user.uid) {
+          console.error("CRITICAL: user.uid is missing in onAuthStateChanged!");
+          toast.error("Authentication state error. Please refresh the page.");
+          return;
+        }
+        // ---------------------------------------------------------------
+
         try {
-          // Fetch applications
+          // Fetch applications for both authenticated and guest users
           const q = collection(db, `users/${user.uid}/applications`);
           const snapshot = await getDocs(q);
           const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           setApplications(data);
 
-          // Fetch user's first name from Firestore
+          // Fetch user's first name from Firestore (only for non-anonymous users)
           if (!user.isAnonymous) {
             const userDocRef = doc(db, `users`, user.uid);
             const userDoc = await getDoc(userDocRef);
             if (userDoc.exists()) {
               setUserFirstName(userDoc.data().firstName || null);
             }
+            // If user doc doesn't exist or firstName isn't set, userFirstName remains null
           }
         } catch (error) {
-          console.error("Error fetching applications:", error);
-          toast.error("Failed to load applications.");
+          // --- IMPROVED LOGGING: Log the specific Firestore error ---
+          console.error("Error fetching applications for UID:", user.uid, error);
+          toast.error("Failed to load applications. Please try again.");
         }
       } else {
-        // Optionally clear applications if user logs out
+        // Clear data if user logs out
         setApplications([]);
-        setUserFirstName(null);
       }
     });
 
@@ -93,6 +103,7 @@ const Dashboard = () => {
                 setApplications(prev => prev.filter(app => app.id !== id));
                 toast.success("Application deleted.");
               } catch (err) {
+                console.error("Delete error:", err);
                 toast.error("Failed to delete.");
               }
             }}
@@ -146,8 +157,6 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Drag end error:", error);
       toast.error("Failed to update status.");
-      // Revert UI update on error if needed
-      // setApplications(prevApplications); // You'd need to store previous state
     }
   };
 
@@ -189,6 +198,13 @@ const Dashboard = () => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // --- DETERMINE WELCOME MESSAGE ---
+  let welcomeName = 'Guest';
+  if (!isGuest) {
+    welcomeName = userFirstName || currentUser?.email || 'User';
+  }
+  // ---------------------------------
+
   return (
     <div style={styles.wrapper}>
       <div style={styles.headerRow}>
@@ -198,9 +214,8 @@ const Dashboard = () => {
         <button onClick={handleLogout} style={styles.logout}>Log Out</button>
       </div>
       <h2 style={styles.welcomeText}>
-        Welcome, {userFirstName || (currentUser?.email || 'Guest')}
+        Welcome, {welcomeName}
       </h2>
-      {/* --- UPDATED: Clarified guest mode message --- */}
       {isGuest && (
         <div style={{ textAlign: 'center', color: '#888', marginBottom: '10px' }}>
           You're in guest mode – your data is temporary and will be lost when you log out or clear browser data.
@@ -257,7 +272,6 @@ const Dashboard = () => {
                                 <div onClick={() => toggleExpanded(app.id)} style={{ fontWeight: 'bold', cursor: 'pointer' }}>
                                   {app.jobTitle} @ {app.company}
                                 </div>
-                                {/* --- IMPROVEMENT: Handle potentially missing date --- */}
                                 {app.date && (
                                   <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '4px' }}>
                                     {app.date instanceof Date ? app.date.toLocaleDateString('he-IL') :
