@@ -1,5 +1,6 @@
+// Signup.js
 import { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'; // Import updateProfile
 import { auth, db } from './firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate, Link } from 'react-router-dom';
@@ -7,18 +8,45 @@ import { useNavigate, Link } from 'react-router-dom';
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState(''); // State for First Name
+  const [lastName, setLastName] = useState('');   // State for Last Name
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
+      // Create user with email and password
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
-      await setDoc(doc(db, "users", userCred.user.uid), {});
+
+      // Update the user's profile displayName (optional, combines first & last)
+      // This makes the name readily available on the user object (user.displayName)
+      await updateProfile(userCred.user, {
+        displayName: `${firstName} ${lastName}`.trim() || null,
+      });
+
+      // Save additional user data (first name, last name) to Firestore
+      // under the 'users/{uid}' document
+      await setDoc(doc(db, "users", userCred.user.uid), {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        // You can add other user-related fields here if needed in the future
+        // email: email, // Email is already in the auth object, but you could store it here too
+      });
+
       alert("Account created!");
       navigate('/dashboard');
     } catch (err) {
       console.error("Signup error:", err.code, err.message);
-      alert(err.message);
+      // Provide user-friendly error messages
+      let errorMessage = "Failed to create account.";
+      if (err.code === 'auth/email-already-in-use') {
+         errorMessage = "This email is already registered.";
+      } else if (err.code === 'auth/invalid-email') {
+         errorMessage = "Please enter a valid email address.";
+      } else if (err.code === 'auth/weak-password') {
+         errorMessage = "Password should be at least 6 characters.";
+      }
+      alert(errorMessage);
     }
   };
 
@@ -31,6 +59,26 @@ export default function Signup() {
 
         <form onSubmit={handleSignup} style={styles.form}>
           <h2 style={styles.header}>Sign Up</h2>
+
+          {/* First Name Input */}
+          <input
+            type="text"
+            value={firstName}
+            onChange={e => setFirstName(e.target.value)}
+            placeholder="First Name"
+            // required // Optional: Make first name required
+            style={styles.input}
+          />
+
+          {/* Last Name Input */}
+          <input
+            type="text"
+            value={lastName}
+            onChange={e => setLastName(e.target.value)}
+            placeholder="Last Name"
+            // required // Optional: Make last name required
+            style={styles.input}
+          />
 
           <input
             type="email"
