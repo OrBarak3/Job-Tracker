@@ -24,15 +24,14 @@ const AddApplication = () => {
         const url = new URL(value);
         let companyGuess = "";
 
-        // Known platforms with subdirectory companies
         if (url.hostname.includes("greenhouse.io") || url.hostname.includes("lever.co")) {
           const pathParts = url.pathname.split('/').filter(Boolean);
-          companyGuess = pathParts[0]; // e.g., 'residenthome'
+          companyGuess = pathParts[0];
         } else {
           const domainParts = url.hostname.split('.');
           companyGuess = domainParts.length === 2
             ? domainParts[0]
-            : domainParts[domainParts.length - 2]; // e.g., 'greenhouse'
+            : domainParts[domainParts.length - 2];
         }
 
         const capitalized = companyGuess.charAt(0).toUpperCase() + companyGuess.slice(1);
@@ -60,6 +59,8 @@ const AddApplication = () => {
     }
 
     try {
+      console.log("Writing to path: users/" + user.uid + "/applications");
+
       await addDoc(
         collection(db, `users/${user.uid}/applications`),
         {
@@ -127,8 +128,8 @@ const AddApplication = () => {
           <option>Home Assignment</option>
           <option>Technical Interview</option>
           <option>HR Interview</option>
-          <option>Rejected (No Interview)</option>
-          <option>Rejected (After Interview)</option>
+          <option>Rejected After Process</option>
+          <option>Rejected Without Response</option>
         </select>
         <input
           name="url"
