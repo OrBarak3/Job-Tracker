@@ -48,7 +48,7 @@ const AddApplication = () => {
       setForm(prev => ({ ...prev, [name]: value }));
     }
   };
-
+  console.log("auth.currentUser:", auth.currentUser);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
