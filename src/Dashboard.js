@@ -147,8 +147,9 @@ const Dashboard = () => {
         </div>
         <button onClick={handleLogout} style={styles.logout}>Log Out</button>
       </div>
-
-      <h2 style={styles.welcomeText}>Welcome, {auth.currentUser?.email}</h2>
+      <h2 style={styles.welcomeText}>
+        Welcome, {auth.currentUser?.isAnonymous ? 'Guest' : auth.currentUser?.email}
+      </h2>
       {isGuest && (
         <div style={{ textAlign: 'center', color: '#888', marginBottom: '10px' }}>
           You're in guest mode – your data won't be saved.
