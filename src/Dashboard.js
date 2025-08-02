@@ -8,7 +8,7 @@ import {
   doc,
   deleteDoc
 } from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
+import { signOut, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { toast } from 'react-toastify';
@@ -27,19 +27,22 @@ const Dashboard = () => {
   const [expandedId, setExpandedId] = useState(null);
   const [editingApp, setEditingApp] = useState(null);
   const [formData, setFormData] = useState({});
+  const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
 
-  const isGuest = auth.currentUser?.isAnonymous;
+  const isGuest = currentUser?.isAnonymous;
 
   useEffect(() => {
-    const fetchApplications = async () => {
-      if (!auth.currentUser || auth.currentUser.isAnonymous) return;
-      const q = collection(db, `users/${auth.currentUser.uid}/applications`);
-      const snapshot = await getDocs(q);
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setApplications(data);
-    };
-    fetchApplications();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user);
+      if (user && !user.isAnonymous) {
+        const q = collection(db, `users/${user.uid}/applications`);
+        const snapshot = await getDocs(q);
+        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setApplications(data);
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
   const handleLogout = async () => {
@@ -60,7 +63,7 @@ const Dashboard = () => {
             onClick={async () => {
               toast.dismiss();
               try {
-                await deleteDoc(doc(db, `users/${auth.currentUser.uid}/applications`, id));
+                await deleteDoc(doc(db, `users/${currentUser.uid}/applications`, id));
                 setApplications(prev => prev.filter(app => app.id !== id));
                 toast.success("Application deleted.");
               } catch (err) {
@@ -82,7 +85,7 @@ const Dashboard = () => {
 
   const handleQuickReject = async (app) => {
     try {
-      const docRef = doc(db, `users/${auth.currentUser.uid}/applications`, app.id);
+      const docRef = doc(db, `users/${currentUser.uid}/applications`, app.id);
       await updateDoc(docRef, { status: 'Rejected Without Response' });
       setApplications(prev =>
         prev.map(a => a.id === app.id ? { ...a, status: 'Rejected Without Response' } : a)
@@ -102,7 +105,7 @@ const Dashboard = () => {
     );
 
     setApplications(updated);
-    const docRef = doc(db, `users/${auth.currentUser.uid}/applications`, draggableId);
+    const docRef = doc(db, `users/${currentUser.uid}/applications`, draggableId);
     await updateDoc(docRef, { status: destination.droppableId });
   };
 
@@ -124,7 +127,7 @@ const Dashboard = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      await updateDoc(doc(db, `users/${auth.currentUser.uid}/applications`, editingApp), formData);
+      await updateDoc(doc(db, `users/${currentUser.uid}/applications`, editingApp), formData);
       setApplications(prev =>
         prev.map(app => app.id === editingApp ? { ...app, ...formData } : app)
       );
@@ -148,14 +151,13 @@ const Dashboard = () => {
         <button onClick={handleLogout} style={styles.logout}>Log Out</button>
       </div>
       <h2 style={styles.welcomeText}>
-        Welcome, {auth.currentUser?.isAnonymous ? 'Guest' : auth.currentUser?.email}
+        Welcome, {currentUser?.isAnonymous ? 'Guest' : currentUser?.email}
       </h2>
       {isGuest && (
         <div style={{ textAlign: 'center', color: '#888', marginBottom: '10px' }}>
           You're in guest mode – your data won't be saved.
         </div>
       )}
-
       <DragDropContext onDragEnd={onDragEnd}>
         <div style={styles.board}>
           {statuses.map((status) => (
