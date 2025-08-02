@@ -6,7 +6,8 @@ import {
   getDocs,
   updateDoc,
   doc,
-  deleteDoc
+  deleteDoc,
+  getDoc
 } from 'firebase/firestore';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
@@ -28,19 +29,30 @@ const Dashboard = () => {
   const [editingApp, setEditingApp] = useState(null);
   const [formData, setFormData] = useState({});
   const [currentUser, setCurrentUser] = useState(null);
+  const [userFirstName, setUserFirstName] = useState(null); // New state for first name
   const navigate = useNavigate();
   const isGuest = currentUser?.isAnonymous;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
-      // --- FIX: Load applications for both authenticated and guest users ---
+
       if (user) {
         try {
+          // Fetch applications
           const q = collection(db, `users/${user.uid}/applications`);
           const snapshot = await getDocs(q);
           const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           setApplications(data);
+
+          // Fetch user's first name from Firestore
+          if (!user.isAnonymous) {
+            const userDocRef = doc(db, `users`, user.uid);
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists()) {
+              setUserFirstName(userDoc.data().firstName || null);
+            }
+          }
         } catch (error) {
           console.error("Error fetching applications:", error);
           toast.error("Failed to load applications.");
@@ -48,8 +60,10 @@ const Dashboard = () => {
       } else {
         // Optionally clear applications if user logs out
         setApplications([]);
+        setUserFirstName(null);
       }
     });
+
     return () => unsubscribe();
   }, []);
 
@@ -71,15 +85,14 @@ const Dashboard = () => {
             onClick={async () => {
               toast.dismiss();
               if (!currentUser) {
-                 toast.error("No user found.");
-                 return;
+                toast.error("No user found.");
+                return;
               }
               try {
                 await deleteDoc(doc(db, `users/${currentUser.uid}/applications`, id));
                 setApplications(prev => prev.filter(app => app.id !== id));
                 toast.success("Application deleted.");
               } catch (err) {
-                console.error("Delete error:", err);
                 toast.error("Failed to delete.");
               }
             }}
@@ -98,8 +111,8 @@ const Dashboard = () => {
 
   const handleQuickReject = async (app) => {
     if (!currentUser) {
-        toast.error("No user found.");
-        return;
+      toast.error("No user found.");
+      return;
     }
     try {
       const docRef = doc(db, `users/${currentUser.uid}/applications`, app.id);
@@ -118,8 +131,8 @@ const Dashboard = () => {
     const { source, destination, draggableId } = result;
     if (!destination || destination.droppableId === source.droppableId) return;
     if (!currentUser) {
-        toast.error("No user found.");
-        return;
+      toast.error("No user found.");
+      return;
     }
 
     const updated = applications.map(app =>
@@ -156,8 +169,8 @@ const Dashboard = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!currentUser) {
-        toast.error("No user found.");
-        return;
+      toast.error("No user found.");
+      return;
     }
     try {
       await updateDoc(doc(db, `users/${currentUser.uid}/applications`, editingApp), formData);
@@ -185,7 +198,7 @@ const Dashboard = () => {
         <button onClick={handleLogout} style={styles.logout}>Log Out</button>
       </div>
       <h2 style={styles.welcomeText}>
-        Welcome, {currentUser?.isAnonymous ? 'Guest' : currentUser?.email}
+        Welcome, {userFirstName || (currentUser?.email || 'Guest')}
       </h2>
       {/* --- UPDATED: Clarified guest mode message --- */}
       {isGuest && (
