@@ -29,17 +29,25 @@ const Dashboard = () => {
   const [formData, setFormData] = useState({});
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
-
   const isGuest = currentUser?.isAnonymous;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
-      if (user && !user.isAnonymous) {
-        const q = collection(db, `users/${user.uid}/applications`);
-        const snapshot = await getDocs(q);
-        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setApplications(data);
+      // --- FIX: Load applications for both authenticated and guest users ---
+      if (user) {
+        try {
+          const q = collection(db, `users/${user.uid}/applications`);
+          const snapshot = await getDocs(q);
+          const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setApplications(data);
+        } catch (error) {
+          console.error("Error fetching applications:", error);
+          toast.error("Failed to load applications.");
+        }
+      } else {
+        // Optionally clear applications if user logs out
+        setApplications([]);
       }
     });
     return () => unsubscribe();
@@ -62,11 +70,16 @@ const Dashboard = () => {
           <button
             onClick={async () => {
               toast.dismiss();
+              if (!currentUser) {
+                 toast.error("No user found.");
+                 return;
+              }
               try {
                 await deleteDoc(doc(db, `users/${currentUser.uid}/applications`, id));
                 setApplications(prev => prev.filter(app => app.id !== id));
                 toast.success("Application deleted.");
               } catch (err) {
+                console.error("Delete error:", err);
                 toast.error("Failed to delete.");
               }
             }}
@@ -84,6 +97,10 @@ const Dashboard = () => {
   };
 
   const handleQuickReject = async (app) => {
+    if (!currentUser) {
+        toast.error("No user found.");
+        return;
+    }
     try {
       const docRef = doc(db, `users/${currentUser.uid}/applications`, app.id);
       await updateDoc(docRef, { status: 'Rejected Without Response' });
@@ -92,6 +109,7 @@ const Dashboard = () => {
       );
       toast.success("Moved to Rejected Without Response");
     } catch (err) {
+      console.error("Quick reject error:", err);
       toast.error("Failed to update status.");
     }
   };
@@ -99,14 +117,25 @@ const Dashboard = () => {
   const onDragEnd = async (result) => {
     const { source, destination, draggableId } = result;
     if (!destination || destination.droppableId === source.droppableId) return;
+    if (!currentUser) {
+        toast.error("No user found.");
+        return;
+    }
 
     const updated = applications.map(app =>
       app.id === draggableId ? { ...app, status: destination.droppableId } : app
     );
-
     setApplications(updated);
-    const docRef = doc(db, `users/${currentUser.uid}/applications`, draggableId);
-    await updateDoc(docRef, { status: destination.droppableId });
+
+    try {
+      const docRef = doc(db, `users/${currentUser.uid}/applications`, draggableId);
+      await updateDoc(docRef, { status: destination.droppableId });
+    } catch (error) {
+      console.error("Drag end error:", error);
+      toast.error("Failed to update status.");
+      // Revert UI update on error if needed
+      // setApplications(prevApplications); // You'd need to store previous state
+    }
   };
 
   const toggleExpanded = (id) => {
@@ -126,6 +155,10 @@ const Dashboard = () => {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+    if (!currentUser) {
+        toast.error("No user found.");
+        return;
+    }
     try {
       await updateDoc(doc(db, `users/${currentUser.uid}/applications`, editingApp), formData);
       setApplications(prev =>
@@ -134,6 +167,7 @@ const Dashboard = () => {
       setEditingApp(null);
       toast.success("Application updated.");
     } catch (err) {
+      console.error("Edit submit error:", err);
       toast.error("Failed to update application.");
     }
   };
@@ -153,9 +187,10 @@ const Dashboard = () => {
       <h2 style={styles.welcomeText}>
         Welcome, {currentUser?.isAnonymous ? 'Guest' : currentUser?.email}
       </h2>
+      {/* --- UPDATED: Clarified guest mode message --- */}
       {isGuest && (
         <div style={{ textAlign: 'center', color: '#888', marginBottom: '10px' }}>
-          You're in guest mode – your data won't be saved.
+          You're in guest mode – your data is temporary and will be lost when you log out or clear browser data.
         </div>
       )}
       <DragDropContext onDragEnd={onDragEnd}>
@@ -187,11 +222,11 @@ const Dashboard = () => {
                           >
                             {editingApp === app.id ? (
                               <form onSubmit={handleEditSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                <input name="jobTitle" value={formData.jobTitle} onChange={handleChange} placeholder="Job Title" />
-                                <input name="company" value={formData.company} onChange={handleChange} placeholder="Company" />
+                                <input name="jobTitle" value={formData.jobTitle} onChange={handleChange} placeholder="Job Title" required />
+                                <input name="company" value={formData.company} onChange={handleChange} placeholder="Company" required />
                                 <input name="url" value={formData.url} onChange={handleChange} placeholder="Job Link" />
                                 <select name="status" value={formData.status} onChange={handleChange}>
-                                  {statuses.map(s => <option key={s}>{s}</option>)}
+                                  {statuses.map(s => <option key={s} value={s}>{s}</option>)}
                                 </select>
                                 <textarea
                                   name="companyDescription"
@@ -209,22 +244,25 @@ const Dashboard = () => {
                                 <div onClick={() => toggleExpanded(app.id)} style={{ fontWeight: 'bold', cursor: 'pointer' }}>
                                   {app.jobTitle} @ {app.company}
                                 </div>
+                                {/* --- IMPROVEMENT: Handle potentially missing date --- */}
                                 {app.date && (
                                   <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '4px' }}>
-                                    {new Date(app.date.seconds * 1000).toLocaleDateString('he-IL')}
+                                    {app.date instanceof Date ? app.date.toLocaleDateString('he-IL') :
+                                     app.date?.seconds ? new Date(app.date.seconds * 1000).toLocaleDateString('he-IL') :
+                                     'Date unknown'}
                                   </div>
                                 )}
                                 {expandedId === app.id && (
                                   <div style={{ marginTop: '8px' }} dangerouslySetInnerHTML={{ __html: app.companyDescription }} />
                                 )}
                                 <div style={styles.footer}>
-                                  <a href={app.url} target="_blank" rel="noreferrer">Job Link</a>
+                                  {app.url && <a href={app.url} target="_blank" rel="noreferrer">Job Link</a>}
                                   <div>
                                     {app.status === 'Submitted' && (
-                                      <button onClick={() => handleQuickReject(app)} style={styles.rejectButton}>↘️</button>
+                                      <button onClick={() => handleQuickReject(app)} style={styles.rejectButton} title="Quick Reject">↘️</button>
                                     )}
-                                    <button onClick={() => handleEditClick(app)} style={styles.edit}>✏️</button>
-                                    <button onClick={() => handleDelete(app.id)} style={styles.delete}>🗑️</button>
+                                    <button onClick={() => handleEditClick(app)} style={styles.edit} title="Edit">✏️</button>
+                                    <button onClick={() => handleDelete(app.id)} style={styles.delete} title="Delete">🗑️</button>
                                   </div>
                                 </div>
                               </>
